@@ -9,12 +9,30 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "Sensorenheten.h"
-
+#include "../../TSEA27-include/SPI/mspi.h"
 
 int main(void)
-{
-	DDRA = 0b11101111;
-	DDRB = 0b10000000;
+{	
+	MSPI_init_master();
+	MSPI_exchange(0b10010100);
+	uint8_t receivedData1;
+	uint8_t receivedData2;
+	receivedData1=MSPI_exchange(0b00000000);
+	receivedData2=MSPI_exchange(0b00000000);
+	
+	MSPI_exchange(0b10010100);
+	receivedData1=MSPI_exchange(0b00000000);
+	receivedData2=MSPI_exchange(0b00000000);
+	
+	
+		
+	MSPI_exchange(0b10000000);
+	receivedData1=MSPI_exchange(0b00000000);	
+	receivedData2=MSPI_exchange(0b00000000);
+	
+
+	/*
+	DDRA = 0b11101111; ///DEBUG ÄNDRA
 	ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); 
 	ADMUX |= (1 << REFS0); 
 	ADMUX |= (1 << MUX2) | (0 << MUX1) | (0 << MUX0); //ADC på PA4 för test 	
@@ -27,6 +45,8 @@ int main(void)
     {
         //TODO för MSPI
     }
+	*/
+	return 0;
 }
 
 ISR(ADC_vect) //läs av 10 värden och byt sedan sensor
