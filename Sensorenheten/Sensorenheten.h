@@ -15,6 +15,14 @@ int sensor7 [10];
 int sensor8 [10];
 int gyro [10];
 
+uint8_t lookUp[255];
+
+int avgVal = 0;
+int sampleCounter = 0;
+int desiredSamples;
+
+int avgValues[10];
+
 int debugBuffer [];
 
 int Vout;

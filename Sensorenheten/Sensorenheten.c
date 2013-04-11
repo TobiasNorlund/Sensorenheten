@@ -29,16 +29,41 @@ int main(void)
     }
 }
 
-ISR(ADC_vect)
+ISR(ADC_vect) //läs av 10 värden och byt sedan sensor
 {
-	//case multplexer = ??
-	PORTA = ADCH & 0b11101111;
-	//PORTB = ADCH & 0b00010000;
+	int distance = lookUp[ADCH]; //konvertera till avstånd
+	if(avgVal == 0)
+	{
+		avgVal = distance;
+	}
+	else if(distance == 0)
+	{
+	}
+	else
+	{
+		avgVal = (avgVal + distance)/2;
+	}		
+	if(sampleCounter== desiredSamples)
+	{
+		avgValues[ADMUX && 0b00000111] = avgVal; // stoppa in medelvärdet på korrekt position i array med medelvärden
+		ADCSRA |= (0 << ADEN); //stäng av ADC
+		if((ADMUX && 0b0000111) ==  0b00000111) //välj nästa ADC
+		{
+			ADMUX =  ADMUX && 0b11111000;
+		}	
+		else 
+		{
+			ADMUX=ADMUX+1;
+		}
+		sampleCounter = 0;	
+		ADCSRA |= (1 << ADEN); //starta ADC
+		ADCSRA |= (1 << ADSC); //börja ny omvandling
+	}
+	else
+	{
+		sampleCounter = sampleCounter+1;
+		ADCSRA |= (1 << ADSC); //börja ny omvandling
+	}
+}		
 
-	Vout = 20.99*ADCH + 0.19; //Tillfällig linjär ekv.
-	//ADEN=0
-	//if(ADMUX=7)
-	//ADMUX=0
-	//else ADMUX=ADMUX+1
-	ADCSRA |= (1 << ADSC); 
-}
+

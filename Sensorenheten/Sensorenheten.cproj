@@ -50,6 +50,7 @@
         </InterfaceProperties>
       </ToolOptions>
     </com_atmel_avrdbg_tool_jtagicemk3>
+    <AsfVersion>3.1.3</AsfVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
