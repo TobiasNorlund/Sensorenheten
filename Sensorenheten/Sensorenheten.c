@@ -9,10 +9,13 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "Sensorenheten.h"
+#include "rotsensor.h"
 #include "../../TSEA27-include/SPI/mspi.h"
 
 int main(void)
 {	
+	Init_rotsensor();
+	sei();//enable interupts
 	MSPI_init_master();
 	MSPI_exchange(0b10010100);
 	uint8_t receivedData1;
@@ -46,6 +49,10 @@ int main(void)
         //TODO för MSPI
     }
 	*/
+	while(1)
+	{
+		//TODO:: Please write your application code
+	}
 	return 0;
 }
 
