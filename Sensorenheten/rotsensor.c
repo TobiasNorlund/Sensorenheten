@@ -28,17 +28,21 @@ volatile uint8_t CurrentLeftSensor=0;
 void Init_rotsensor(void)
 {
 	//setup pin change interupts
-	PCICR = (1<<PCIE2)|(1<<PCIE3);//enable pin change interupt 3
+	PCICR = (1<<PCIE2)|(1<<PCIE3);//enable pin change interupt 2 och 3
 	PCMSK3 = (1<<PCINT30);// enable on interupt pin 30
-	PCMSK2 = (1<<PCINT16);//  enable on interupt pin 16
-	//setup timers
-	//1 och 3 16bit timers
+	PCMSK2 = (1<<PCINT16);// enable on interupt pin 16
 	
+	//setup timers 1 och 3 16bit timers
+	//start clock and set clock devider.
+	TCCR1B=(1<<CS10)|(0<<CS11)|(1<<CS12);//clk/1024 (From prescaler)
+	TCCR3B=(1<<CS10)|(0<<CS11)|(1<<CS12);// p. 134 i manualen
+
+	//enable overflow interupt
 	TIMSK1=(1<<TOIE1);//overflow interupt
 	TIMSK3=(1<<TOIE3);//overflow interupt
 	
-	TCNT1=0;//init value
-	TCNT3=0;//init value
+	TCNT1=0;//init value for counter 1
+	TCNT3=0;//init value for counter 3
 }
 
 ISR(PCINT3_vect)
