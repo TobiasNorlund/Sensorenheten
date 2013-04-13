@@ -28,8 +28,9 @@ volatile uint8_t CurrentLeftSensor=0;
 void Init_rotsensor(void)
 {
 	//setup pin change interupts
-	PCICR = (1<<PCIE3);//enable pin change interupt 3
-	PCMSK3 = (1<<PCINT29)|(1<<PCINT30);// pin 29 30
+	PCICR = (1<<PCIE2)|(1<<PCIE3);//enable pin change interupt 3
+	PCMSK3 = (1<<PCINT30);// enable on interupt pin 30
+	PCMSK2 = (1<<PCINT16);//  enable on interupt pin 16
 	//setup timers
 	//1 och 3 16bit timers
 	
@@ -42,31 +43,26 @@ void Init_rotsensor(void)
 
 ISR(PCINT3_vect)
 {
-	if(rightSensorPrevState!=RIGHTSENSOR)
+	if(NUMSAMPLES<=CurrentRightSensor)
 	{
-		if(NUMSAMPLES<=CurrentRightSensor)
-		{
-			CurrentRightSensor=0;
-		}
-		rightSensor[CurrentRightSensor]=TCNT1+65536*rightOverflow;//blir ändå overflow i lagringen, kolla på det
-		CurrentRightSensor++;
-		TCNT1=0;//reset
-		rightSensorPrevState=RIGHTSENSOR;
+		CurrentRightSensor=0;
 	}
-	if(leftSensorPrevState!=LEFTSENSOR)
-	{
-		if(NUMSAMPLES<=CurrentLeftSensor)
-		{
-			CurrentLeftSensor=0;
-		}
-		rightSensor[CurrentLeftSensor]=TCNT3+65536*leftOverflow;//blir ändå overflow i lagringen, kolla på det
-		CurrentLeftSensor++;
-		TCNT3=0;//reset
-		leftSensorPrevState=LEFTSENSOR;
-	}
-	test++;
+	rightSensor[CurrentRightSensor]=TCNT1+65536*rightOverflow;//blir ändå overflow i lagringen, kolla på det
+	CurrentRightSensor++;
+	TCNT1=0;//reset
+	rightSensorPrevState=RIGHTSENSOR;
 }
-
+ISR(PCINT2_vect)
+{
+	if(NUMSAMPLES<=CurrentLeftSensor)
+	{
+		CurrentLeftSensor=0;
+	}
+	rightSensor[CurrentLeftSensor]=TCNT3+65536*leftOverflow;//blir ändå overflow i lagringen, kolla på det
+	CurrentLeftSensor++;
+	TCNT3=0;//reset
+	leftSensorPrevState=LEFTSENSOR;
+}
 ISR(TIMER1_OVF_vect) {
 	rightOverflow++;
 }
