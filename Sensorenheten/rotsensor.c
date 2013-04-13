@@ -51,9 +51,10 @@ ISR(PCINT3_vect)
 	{
 		CurrentRightSensor=0;
 	}
-	rightSensor[CurrentRightSensor]=TCNT1+65536*rightOverflow;//blir ändå overflow i lagringen, kolla på det
+	rightSensor[CurrentRightSensor]=TCNT1+65536*rightOverflow;//blir ändå overflow i lagringen, kolla på det. 65536 = 2^16
 	CurrentRightSensor++;
 	TCNT1=0;//reset
+	rightOverflow=0;
 	rightSensorPrevState=RIGHTSENSOR;
 }
 ISR(PCINT2_vect)
@@ -62,9 +63,10 @@ ISR(PCINT2_vect)
 	{
 		CurrentLeftSensor=0;
 	}
-	rightSensor[CurrentLeftSensor]=TCNT3+65536*leftOverflow;//blir ändå overflow i lagringen, kolla på det
+	rightSensor[CurrentLeftSensor]=TCNT3+65536*leftOverflow;//blir ändå overflow i lagringen, kolla på det. 65536 = 2^16
 	CurrentLeftSensor++;
 	TCNT3=0;//reset
+	leftOverflow=0;
 	leftSensorPrevState=LEFTSENSOR;
 }
 ISR(TIMER1_OVF_vect) {
