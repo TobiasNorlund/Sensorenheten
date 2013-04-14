@@ -93,35 +93,35 @@ ISR(ADC_vect)
 {
 	switch (currentDistSensor)
 	{
-	  case 0:
-		distSensor0[currentSample]=ADCH;
-		break;
-	  case 1:
-		distSensor1[currentSample]=ADCH;
-		break;
-	  case 2:
-		distSensor2[currentSample]=ADCH;
-		break;
-	  case 3:
-		distSensor3[currentSample]=ADCH;
-		break;
-	  case 4:
-		distSensor4[currentSample]=ADCH;
-		break;
-	  case 5:
-		distSensor5[currentSample]=ADCH;
-		break;
-	  case 6:
-		distSensor6[currentSample]=ADCH;
-		break;
-	  case 7:
-		distSensor7[currentSample]=ADCH;
-		break;
-	  default:
-		currentDistSensor=0;//reset
-		currentSample=0;
-		changeDistSensor(currentDistSensor);//update ad mux
-		//detta buggar dock bort currentSample=0;
+		case 0:
+			distSensor0[currentSample]=ADCH;
+			break;
+		case 1:
+			distSensor1[currentSample]=ADCH;
+			break;
+		case 2:
+			distSensor2[currentSample]=ADCH;
+			break;
+		case 3:
+			distSensor3[currentSample]=ADCH;
+			break;
+		case 4:
+			distSensor4[currentSample]=ADCH;
+			break;
+		case 5:
+			distSensor5[currentSample]=ADCH;
+			break;
+		case 6:
+			distSensor6[currentSample]=ADCH;
+			break;
+		case 7:
+			distSensor7[currentSample]=ADCH;
+			break;
+		default:
+			currentDistSensor=0;//reset
+			currentSample=0;
+			changeDistSensor(currentDistSensor);//update ad mux
+			//detta buggar dock bort currentSample=0;
 	}
 	currentSample++;
 	if(NUMSAMPLES<currentSample)
