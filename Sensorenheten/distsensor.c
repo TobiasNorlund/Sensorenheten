@@ -39,14 +39,35 @@ void changeDistSensor(uint8_t ch)
 	ADMUX |= ch;// selecting channel
 }
 
-uint8_t filterSampleArray(uint8_t *samples, uint8_t numOfSamples)
+uint8_t filterSampleArray(uint8_t *samples, uint8_t numOfSamples, uint8_t threshold)
 {
-	for(uint8_t i = 0; i <=numOfSamples; i++)
+	uint8_t maxNumInRow=0;
+	uint8_t currentNumInRow=0;
+	uint8_t current=samples[0];
+	uint8_t bestSample=samples[0];
+	for(uint8_t i = 0; i < numOfSamples; i++)
 	{
-		// do some
-		//samples[i]
+		if(abs(samples[i]-samples[i+1]) < threshold)//TODO fix abs
+		{
+			currentNumInRow++;
+		}
+		else
+		{
+			if(maxNumInRow<currentNumInRow)
+			{
+				bestSample=current;
+				maxNumInRow=currentNumInRow;
+				currentNumInRow=0;
+				current=samples[i];
+			}
+		}
+		if(maxNumInRow<currentNumInRow)
+		{
+			bestSample=current;
+			maxNumInRow=currentNumInRow;
+		}
 	}
-	return samples[0];//TODO //return result
+	return bestSample;//return result
 }
 
 uint8_t longDistSensor(uint8_t sample)
