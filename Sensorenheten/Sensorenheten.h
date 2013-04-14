@@ -5,14 +5,6 @@
  *  Author: tobno568
  */ 
 
-int sensor1 [10];
-int sensor2 [10];
-int sensor3 [10];
-int sensor4 [10];
-int sensor5 [10];
-int sensor6 [10];
-int sensor7 [10];
-int sensor8 [10];
 int gyro [10];
 
 uint8_t lookUp[255];

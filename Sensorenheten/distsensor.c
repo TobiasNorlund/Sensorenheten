@@ -6,8 +6,6 @@
  */ 
 #include "distsensor.h"
 
-#define NUMSAMPLES 10
-
 #define MAXIMUMVALUELONG 255 //TODO UPDATE
 #define MINIMUMVALUELONG 0
 #define MAXIMUMVALUESHORT 255
@@ -15,15 +13,6 @@
 
 uint8_t currentDistSensor=0;
 uint8_t currentSample=0;
-
-volatile uint8_t distSensor0[NUMSAMPLES];
-volatile uint8_t distSensor1[NUMSAMPLES];
-volatile uint8_t distSensor2[NUMSAMPLES];
-volatile uint8_t distSensor3[NUMSAMPLES];
-volatile uint8_t distSensor4[NUMSAMPLES];
-volatile uint8_t distSensor5[NUMSAMPLES];
-volatile uint8_t distSensor6[NUMSAMPLES];
-volatile uint8_t distSensor7[NUMSAMPLES];
 
 
 void Init_distsensor(void)
@@ -39,7 +28,19 @@ void changeDistSensor(uint8_t ch)
 	ADMUX |= ch;// selecting channel
 }
 
-uint8_t filterSampleArray(uint8_t *samples, uint8_t numOfSamples, uint8_t threshold)
+uint8_t absDist(uint8_t a1, uint8_t a2)
+{
+	if(a1 < a2)
+	{
+		return a2-a1;
+	}
+	else
+	{
+		return a1-a2;
+	}
+}
+
+uint8_t filterSampleArray(volatile uint8_t *samples, uint8_t numOfSamples, uint8_t threshold)
 {
 	uint8_t maxNumInRow=0;
 	uint8_t currentNumInRow=0;
@@ -47,7 +48,7 @@ uint8_t filterSampleArray(uint8_t *samples, uint8_t numOfSamples, uint8_t thresh
 	uint8_t bestSample=samples[0];
 	for(uint8_t i = 0; i < numOfSamples; i++)
 	{
-		if(abs(samples[i]-samples[i+1]) < threshold)//TODO fix abs
+		if(absDist(samples[i], samples[i+1]) < threshold)//TODO fix abs
 		{
 			currentNumInRow++;
 		}
@@ -115,28 +116,28 @@ ISR(ADC_vect)
 	switch (currentDistSensor)
 	{
 		case 0:
-			distSensor0[currentSample]=ADCH;
+			distSensor0[currentSample]=ADC>>2;
 			break;
 		case 1:
-			distSensor1[currentSample]=ADCH;
+			distSensor1[currentSample]=ADC>>2;
 			break;
 		case 2:
-			distSensor2[currentSample]=ADCH;
+			distSensor2[currentSample]=ADC>>2;
 			break;
 		case 3:
-			distSensor3[currentSample]=ADCH;
+			distSensor3[currentSample]=ADC>>2;
 			break;
 		case 4:
-			distSensor4[currentSample]=ADCH;
+			distSensor4[currentSample]=ADC>>2;
 			break;
 		case 5:
-			distSensor5[currentSample]=ADCH;
+			distSensor5[currentSample]=ADC>>2;
 			break;
 		case 6:
-			distSensor6[currentSample]=ADCH;
+			distSensor6[currentSample]=ADC>>2;
 			break;
 		case 7:
-			distSensor7[currentSample]=ADCH;
+			distSensor7[currentSample]=ADC>>2;
 			break;
 		default:
 			currentDistSensor=0;//reset

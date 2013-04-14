@@ -6,27 +6,25 @@
  */ 
 #include "rotsensor.h"
 
-#define NUMSAMPLES 10
-
-#define RIGHTSENSOR PIND&(1<<5)//pd5
-#define LEFTSENSOR PIND&(1<<6)//pd6
-
-uint8_t rightSensorPrevState=0;
-uint8_t leftSensorPrevState=0;
-
-uint8_t rightOverflow=0;
-uint8_t leftOverflow=0;
-
-uint8_t test=0;
-
-volatile uint16_t rightSensor[NUMSAMPLES];
-volatile uint16_t leftSensor[NUMSAMPLES];
-
-volatile uint8_t CurrentRightSensor=0;
-volatile uint8_t CurrentLeftSensor=0;
+#define WHEELDIAM 65 // mm
+#define PI 3.14 
+#define NUMBEROFSTRIPES 10
+/*
+	+1 var 1024 klockcykel
+	8Mhz = 8000000 Hz
+	8000000/1024=7812.5
+	1/7812.5 = 0.000128 s per +1
+*/
+#define TICKTIME 0.000128 // TODO on clock update 1024/8000000=0.000128
 
 void Init_rotsensor(void)
 {
+	rightOverflow=0;
+	leftOverflow=0;
+
+	CurrentRightSensor=0;
+	CurrentLeftSensor=0;
+	
 	//setup pin change interupts
 	PCICR = (1<<PCIE2)|(1<<PCIE3);//enable pin change interupt 2 och 3
 	PCMSK3 = (1<<PCINT30);// enable on interupt pin 30
@@ -45,30 +43,65 @@ void Init_rotsensor(void)
 	TCNT3=0;//init value for counter 3
 }
 
+uint8_t calcVelocityRight(void)
+{
+	if(rightSensorOverFlow[CurrentRightSensor]>0)//TODO tune
+	{
+		return 0;// om overflow står vi nog stilla
+	}
+	else if(rightSensor[CurrentLeftSensor]==0)
+	{
+		return 255;
+	}
+	else
+	{
+		return WHEELDIAM*PI/(rightSensor[CurrentRightSensor]*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
+	}
+}
+
+uint8_t calcVelocityLeft(void)
+{
+	if(leftSensorOverFlow[CurrentLeftSensor]>0)//TODO tune
+	{
+		return 0;// om overflow står vi nog stilla
+	}
+	else if(leftSensor[CurrentLeftSensor]==0)
+	{
+		return 255;
+	}
+	else
+	{
+		return WHEELDIAM*PI/(leftSensor[CurrentLeftSensor]*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
+	}
+}
+
+
 ISR(PCINT3_vect)
 {
 	if(NUMSAMPLES<=CurrentRightSensor)
 	{
 		CurrentRightSensor=0;
 	}
-	rightSensor[CurrentRightSensor]=TCNT1+65536*rightOverflow;//blir ändå overflow i lagringen, kolla på det. 65536 = 2^16
+	rightSensor[CurrentRightSensor]=TCNT1;
+	rightSensorOverFlow[CurrentRightSensor]=rightOverflow;
 	CurrentRightSensor++;
 	TCNT1=0;//reset
 	rightOverflow=0;
-	rightSensorPrevState=RIGHTSENSOR;
 }
+
 ISR(PCINT2_vect)
 {
 	if(NUMSAMPLES<=CurrentLeftSensor)
 	{
 		CurrentLeftSensor=0;
 	}
-	rightSensor[CurrentLeftSensor]=TCNT3+65536*leftOverflow;//blir ändå overflow i lagringen, kolla på det. 65536 = 2^16
+	leftSensor[CurrentLeftSensor]=TCNT3;
+	leftSensorOverFlow[CurrentLeftSensor]=leftOverflow;
 	CurrentLeftSensor++;
 	TCNT3=0;//reset
 	leftOverflow=0;
-	leftSensorPrevState=LEFTSENSOR;
 }
+
 ISR(TIMER1_OVF_vect) {
 	rightOverflow++;
 }

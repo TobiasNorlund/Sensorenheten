@@ -5,92 +5,63 @@
  *  Author: tobno568
  */ 
 
+#define F_CPU 8000000UL // 8mhz 
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 #include "Sensorenheten.h"
 #include "rotsensor.h"
+#include "distsensor.h"
 #include "../../TSEA27-include/SPI/mspi.h"
+
+
 
 int main(void)
 {	
 	Init_rotsensor();
+	Init_distsensor();
 	sei();//enable interupts
 	MSPI_init_master();
-	MSPI_exchange(0b10010100);
 	uint8_t receivedData1;
 	uint8_t receivedData2;
-	receivedData1=MSPI_exchange(0b00000000);
-	receivedData2=MSPI_exchange(0b00000000);
-	
-	MSPI_exchange(0b10010100);
-	receivedData1=MSPI_exchange(0b00000000);
-	receivedData2=MSPI_exchange(0b00000000);
-	
-	
-		
-	MSPI_exchange(0b10000000);
-	receivedData1=MSPI_exchange(0b00000000);	
-	receivedData2=MSPI_exchange(0b00000000);
+
 	
 
-	/*
-	DDRA = 0b11101111; ///DEBUG ÄNDRA
-	ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); 
-	ADMUX |= (1 << REFS0); 
-	ADMUX |= (1 << MUX2) | (0 << MUX1) | (0 << MUX0); //ADC på PA4 för test 	
-	ADMUX |= (1 << ADLAR); 
-	ADCSRA |= (1 << ADEN); 
-	ADCSRA |= (1 << ADIE);
-	sei();
-	ADCSRA |= (1 << ADSC); 
-    while(1)
-    {
-        //TODO för MSPI
-    }
-	*/
+	uint8_t sensorDataMsg[12];
+	sensorDataMsg[0]=0x00|12;
+	
 	while(1)
 	{
-		//TODO:: Please write your application code
+		_delay_ms(100);
+		
+		MSPI_exchange(0b10010100);
+		receivedData1=MSPI_exchange(0b00000000);
+		receivedData2=MSPI_exchange(0b00000000);
+			
+		MSPI_exchange(0b10010100);
+		receivedData1=MSPI_exchange(0b00000000);
+		receivedData2=MSPI_exchange(0b00000000);
+			
+			
+		MSPI_exchange(0b10000000);
+		receivedData1=MSPI_exchange(0b00000000);
+		receivedData2=MSPI_exchange(0b00000000);
+		
+		//constuct sensor message, move to somewhere else
+		sensorDataMsg[1]= longDistSensor(filterSampleArray(distSensor0, 10, 5));
+		sensorDataMsg[2] = longDistSensor(filterSampleArray(distSensor1, 10, 5));
+		sensorDataMsg[3] = longDistSensor(filterSampleArray(distSensor2, 10, 5));
+		sensorDataMsg[4] = longDistSensor(filterSampleArray(distSensor3, 10, 5));
+		sensorDataMsg[5] = shortDistSensor(filterSampleArray(distSensor4, 10, 5));
+		sensorDataMsg[6] = shortDistSensor(filterSampleArray(distSensor5, 10, 5));
+		sensorDataMsg[7] = shortDistSensor(filterSampleArray(distSensor6, 10, 5));
+		sensorDataMsg[8] = shortDistSensor(filterSampleArray(distSensor7, 10, 5));
+		sensorDataMsg[9] = receivedData1;//GYRO
+		sensorDataMsg[10] = receivedData2;//GYRO
+		sensorDataMsg[11] = calcVelocityRight();//rot höger	mm/sek
+		sensorDataMsg[12] = calcVelocityLeft();//rot vänster mm/sek
+
 	}
 	return 0;
 }
-
-ISR(ADC_vect) //läs av 10 värden och byt sedan sensor
-{
-	int distance = lookUp[ADCH]; //konvertera till avstånd
-	if(avgVal == 0)
-	{
-		avgVal = distance;
-	}
-	else if(distance == 0)
-	{
-	}
-	else
-	{
-		avgVal = (avgVal + distance)/2;
-	}		
-	if(sampleCounter== desiredSamples)
-	{
-		avgValues[ADMUX && 0b00000111] = avgVal; // stoppa in medelvärdet på korrekt position i array med medelvärden
-		ADCSRA |= (0 << ADEN); //stäng av ADC
-		if((ADMUX && 0b0000111) ==  0b00000111) //välj nästa ADC
-		{
-			ADMUX =  ADMUX && 0b11111000;
-		}	
-		else 
-		{
-			ADMUX=ADMUX+1;
-		}
-		sampleCounter = 0;	
-		ADCSRA |= (1 << ADEN); //starta ADC
-		ADCSRA |= (1 << ADSC); //börja ny omvandling
-	}
-	else
-	{
-		sampleCounter = sampleCounter+1;
-		ADCSRA |= (1 << ADSC); //börja ny omvandling
-	}
-}		
-
-
