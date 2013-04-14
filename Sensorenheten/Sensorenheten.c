@@ -15,8 +15,6 @@
 #include "distsensor.h"
 #include "../../TSEA27-include/SPI/mspi.h"
 
-
-
 int main(void)
 {	
 	Init_rotsensor();
@@ -34,7 +32,8 @@ int main(void)
 	while(1)
 	{
 		_delay_ms(100);
-		
+
+		MSPI_SS_LOW;
 		MSPI_exchange(0b10010100);
 		receivedData1=MSPI_exchange(0b00000000);
 		receivedData2=MSPI_exchange(0b00000000);
@@ -47,7 +46,8 @@ int main(void)
 		MSPI_exchange(0b10000000);
 		receivedData1=MSPI_exchange(0b00000000);
 		receivedData2=MSPI_exchange(0b00000000);
-		
+		MSPI_SS_HIGH;
+
 		//constuct sensor message, move to somewhere else
 		sensorDataMsg[1]= longDistSensor(filterSampleArray(distSensor0, 10, 5));
 		sensorDataMsg[2] = longDistSensor(filterSampleArray(distSensor1, 10, 5));

@@ -6,8 +6,8 @@
  */ 
 #include "rotsensor.h"
 
-#define WHEELDIAM 65 // mm
-#define PI 3.14 
+#define WHEELDIAM 6.5f // cm
+#define PI 3.14f 
 #define NUMBEROFSTRIPES 10
 /*
 	+1 var 1024 klockcykel
@@ -15,7 +15,7 @@
 	8000000/1024=7812.5
 	1/7812.5 = 0.000128 s per +1
 */
-#define TICKTIME 0.000128 // TODO on clock update 1024/8000000=0.000128
+#define TICKTIME 0.000128f // TODO on clock update 1024/8000000=0.000128
 
 void Init_rotsensor(void)
 {
