@@ -94,6 +94,14 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\TSEA27-include\message.c">
+      <SubType>compile</SubType>
+      <Link>message.c</Link>
+    </Compile>
+    <Compile Include="..\..\TSEA27-include\message.h">
+      <SubType>compile</SubType>
+      <Link>message.h</Link>
+    </Compile>
     <Compile Include="..\..\TSEA27-include\SPI\mspi.c">
       <SubType>compile</SubType>
       <Link>mspi.c</Link>
@@ -101,6 +109,14 @@
     <Compile Include="..\..\TSEA27-include\SPI\mspi.h">
       <SubType>compile</SubType>
       <Link>mspi.h</Link>
+    </Compile>
+    <Compile Include="..\..\TSEA27-include\SPI\spi_slave.c">
+      <SubType>compile</SubType>
+      <Link>spi_slave.c</Link>
+    </Compile>
+    <Compile Include="..\..\TSEA27-include\SPI\spi_slave.h">
+      <SubType>compile</SubType>
+      <Link>spi_slave.h</Link>
     </Compile>
     <Compile Include="distsensor.c">
       <SubType>compile</SubType>
