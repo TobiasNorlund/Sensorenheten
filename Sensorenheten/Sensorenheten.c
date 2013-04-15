@@ -22,11 +22,20 @@ int main(void)
 	Init_rotsensor();
 	Init_distsensor();
 	SPI_SLAVE_init();
-	sei();//enable interupts
 	MSPI_init_master();
 
+	//timed interupt init	
+	TIMSK0 = (1<<OCIE0A);// Enable Interrupt TimerCounter0 Compare Match A (SIG_OUTPUT_COMPARE0A)
+	TCCR0A = (1<<WGM01); // Mode = CTC, clear on compare, dvs reseta räknaren
+	TCCR0B = (1<<CS02)|(0<<CS01)|(1<<CS00);// Clock/1024, 0.000128 seconds per tick
+	OCR0A = 0.02f/0.000128f; // 0.2f/0.000128f ger 50 gånger i sekunden 1/50= 0.02
+	currentGyroCell = 0;
+	//end timed interupt init
+	
+	sei();//enable interupts
+
 	// används för att skicka
-	uint8_t msgR[16];
+	uint8_t msgR[32];
 	uint8_t lenR;	
 	uint8_t typeR;
 	// används för att taemot
@@ -40,7 +49,6 @@ int main(void)
 			switch (type)
 			{
 				case TYPE_REQUEST_SENSOR_DATA:
-					readGyro();//TODO move to timed interupt
 					constructSensorMessage(msgR, &lenR);
 					SPI_SLAVE_write(msgR, TYPE_REPLY_SENSOR_DATA, lenR);
 					break;
@@ -50,8 +58,13 @@ int main(void)
 	return 0;
 }
 
-void readGyro(void)
+//timed interup
+ISR(SIG_OUTPUT_COMPARE0A)
 {
+	//gyro data
+	uint8_t receivedData1;
+	uint8_t receivedData2;
+
 	MSPI_SS_LOW;
 	MSPI_exchange(0b10010100);
 	receivedData1=MSPI_exchange(0b00000000);
@@ -66,21 +79,40 @@ void readGyro(void)
 	receivedData1=MSPI_exchange(0b00000000);
 	receivedData2=MSPI_exchange(0b00000000);
 	MSPI_SS_HIGH;
+	
+	currentGyroCell++;
+	if(NUMGYROSAMPLES<=currentGyroCell)
+	{
+		currentGyroCell=0;
+	}
+	gyroData[currentGyroCell]=(((uint16_t)receivedData1)<<8)|(uint16_t)receivedData2;
+	
 }
 
 void constructSensorMessage(uint8_t *msg, uint8_t *len)
 {
-	//constuct sensor message, move to somewhere else
-	msg[0]= longDistSensor(filterSampleArray(distSensor0, 10, 5));
-	msg[1] = longDistSensor(filterSampleArray(distSensor1, 10, 5));
-	msg[2] = longDistSensor(filterSampleArray(distSensor2, 10, 5));
-	msg[3] = longDistSensor(filterSampleArray(distSensor3, 10, 5));
-	msg[4] = shortDistSensor(filterSampleArray(distSensor4, 10, 5));
-	msg[5] = shortDistSensor(filterSampleArray(distSensor5, 10, 5));
-	msg[6] = shortDistSensor(filterSampleArray(distSensor6, 10, 5));
-	msg[7] = shortDistSensor(filterSampleArray(distSensor7, 10, 5));
-	msg[8] = receivedData1;//GYRO
-	msg[9] = receivedData2;//GYRO
-	msg[10] = calcVelocityRight();//rot höger	cm/sek
-	msg[11] = calcVelocityLeft();//rot vänster cm/sek
+	//constuct sensor message
+	msg[0] = IDSENSOR1;
+	msg[1] = longDistSensor(filterSampleArray(distSensor0, 10, 5));
+	msg[2] = IDSENSOR2;
+	msg[3] = longDistSensor(filterSampleArray(distSensor1, 10, 5));
+	msg[4] = IDSENSOR3;
+	msg[5] = longDistSensor(filterSampleArray(distSensor2, 10, 5));
+	msg[6] = IDSENSOR4;
+	msg[7] = longDistSensor(filterSampleArray(distSensor3, 10, 5));
+	msg[8] = IDSENSOR5;
+	msg[9] = shortDistSensor(filterSampleArray(distSensor4, 10, 5));
+	msg[10] = IDSENSOR6;
+	msg[11] = shortDistSensor(filterSampleArray(distSensor5, 10, 5));
+	msg[12] = IDSENSOR7;
+	msg[13] = shortDistSensor(filterSampleArray(distSensor6, 10, 5));
+	msg[14] = IDSENSOR8;
+	msg[15] = shortDistSensor(filterSampleArray(distSensor7, 10, 5));
+	msg[16] = IDGYROSENSOR;
+	msg[17] = gyroData[currentGyroCell]&0b1111111100000000;//GYRO TODO fixa medelvärdesfilter
+	msg[18] = gyroData[currentGyroCell]&0b0000000011111111;//GYRO
+	msg[19] = IDSPEEDRIGHT;
+	msg[20] = calcVelocityRight();//rot höger	cm/sek
+	msg[21] = IDSPEEDLEFT;
+	msg[22] = calcVelocityLeft();//rot vänster cm/sek
 }
