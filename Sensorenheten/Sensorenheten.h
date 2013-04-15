@@ -5,16 +5,8 @@
  *  Author: tobno568
  */ 
 
-int gyro [10];
+void constructSensorMessage(uint8_t *msg, uint8_t *len);
 
-uint8_t lookUp[255];
-
-int avgVal = 0;
-int sampleCounter = 0;
-int desiredSamples;
-
-int avgValues[10];
-
-int debugBuffer [];
-
-int Vout;
+#define NUMGYROSAMPLES 10
+volatile uint8_t currentGyroCell;
+volatile uint16_t gyroData[NUMGYROSAMPLES];

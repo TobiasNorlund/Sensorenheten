@@ -137,6 +137,14 @@ uint8_t shortDistSensor(uint8_t sample)
 
 ISR(ADC_vect)
 {
+	uint8_t nextDistSensor;
+	currentSample++;//uppdatera precis innan så den alltid pekar på senaste värdet
+	if(NUMSAMPLES<currentSample)
+	{
+		currentSample=0;
+		nextDistSensor = currentDistSensor+1;//next sensor
+		changeDistSensor(nextDistSensor);//update ad mux
+	}
 	switch (currentDistSensor)
 	{
 		case 0:
@@ -169,17 +177,11 @@ ISR(ADC_vect)
 			changeDistSensor(currentDistSensor);//update ad mux
 			//detta buggar dock bort currentSample=0;
 	}
-	currentSample++;
-	if(NUMSAMPLES<currentSample)
+	if(7<nextDistSensor)
 	{
-		currentSample=0;
-		currentDistSensor++;//next sensor
-		changeDistSensor(currentDistSensor);//update ad mux
+		nextDistSensor=0;
+		changeDistSensor(nextDistSensor);//update ad mux
 	}
-	if(7<currentDistSensor)
-	{
-		currentDistSensor=0;
-		changeDistSensor(currentDistSensor);//update ad mux
-	}
+	currentDistSensor=nextDistSensor;
 	ADCSRA |= (1<<ADSC); //börja ny omvandling
 }
