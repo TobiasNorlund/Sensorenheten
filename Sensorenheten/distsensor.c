@@ -28,6 +28,61 @@ void changeDistSensor(uint8_t ch)
 	ADMUX |= ch;// selecting channel
 }
 
+uint8_t filterSampleArray(volatile uint8_t *samples, uint8_t numOfSamples)
+{
+	uint8_t globalMin = 255;
+	for(uint8_t i = 0; i < numOfSamples; i++)
+	{
+		if(globalMin > samples[i])
+		{
+			globalMin = samples[i];
+		}
+	}
+	return globalMin;	
+}
+
+/*
+uint8_t filterSampleArray(volatile uint8_t *samples, uint8_t numOfSamples, uint8_t threshold)
+{
+	
+	
+	uint8_t maxNumInRow=0;
+	uint8_t currentNumInRow=0;
+	uint8_t current=samples[0];
+	uint8_t bestSample=samples[0];
+	uint8_t sumCurrentSamplesInRow = 0;
+	uint8_t bestSamplesInRow = 0;
+	uint8_t sumBestSamplesInRow = 0;
+	for(uint8_t i = 0; i < numOfSamples; i++)
+	{
+		if(absDist(samples[i], samples[i+1]) < threshold)//TODO fix abs
+		{
+			currentNumInRow++;
+			sumCurrentSamplesInRow = sumCurrentSamplesInRow + samples[i];
+		}
+		else
+		{
+			if(maxNumInRow<currentNumInRow)
+			{
+				bestSample=current;
+				maxNumInRow=currentNumInRow;
+				currentNumInRow=0;
+				current=samples[i];
+				bestSamplesInRow = currentNumInRow;
+				sumBestSamplesInRow = sumCurrentSamplesInRow;
+				sumCurrentSamplesInRow = 0;
+			}
+		}
+		if(maxNumInRow<currentNumInRow)
+		{
+			bestSample=current;
+			maxNumInRow=currentNumInRow;
+		}
+	}
+	return bestSample;//return result
+	
+}
+
 uint8_t absDist(uint8_t a1, uint8_t a2)
 {
 	if(a1 < a2)
@@ -39,38 +94,7 @@ uint8_t absDist(uint8_t a1, uint8_t a2)
 		return a1-a2;
 	}
 }
-
-uint8_t filterSampleArray(volatile uint8_t *samples, uint8_t numOfSamples, uint8_t threshold)
-{
-	uint8_t maxNumInRow=0;
-	uint8_t currentNumInRow=0;
-	uint8_t current=samples[0];
-	uint8_t bestSample=samples[0];
-	for(uint8_t i = 0; i < numOfSamples; i++)
-	{
-		if(absDist(samples[i], samples[i+1]) < threshold)//TODO fix abs
-		{
-			currentNumInRow++;
-		}
-		else
-		{
-			if(maxNumInRow<currentNumInRow)
-			{
-				bestSample=current;
-				maxNumInRow=currentNumInRow;
-				currentNumInRow=0;
-				current=samples[i];
-			}
-		}
-		if(maxNumInRow<currentNumInRow)
-		{
-			bestSample=current;
-			maxNumInRow=currentNumInRow;
-		}
-	}
-	return bestSample;//return result
-}
-
+*/
 uint8_t longDistSensor(uint8_t sample)
 {
 	// ska hantera om sample är utanför look up tables intervall
