@@ -59,7 +59,7 @@ int main(void)
 }
 
 //timed interup
-ISR(SIG_OUTPUT_COMPARE0A)
+ISR(TIM0_COMPA_vect)
 {
 	//gyro data
 	uint8_t receivedData1;
@@ -93,21 +93,21 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 {
 	//constuct sensor message
 	msg[0] = IDSENSOR1;
-	msg[1] = longDistSensor(filterSampleArray(distSensor0, 10, 5));
+	msg[1] = longDistSensor(filterSampleArray(distSensor0, 10));
 	msg[2] = IDSENSOR2;
-	msg[3] = longDistSensor(filterSampleArray(distSensor1, 10, 5));
+	msg[3] = longDistSensor(filterSampleArray(distSensor1, 10));
 	msg[4] = IDSENSOR3;
-	msg[5] = longDistSensor(filterSampleArray(distSensor2, 10, 5));
+	msg[5] = longDistSensor(filterSampleArray(distSensor2, 10));
 	msg[6] = IDSENSOR4;
-	msg[7] = longDistSensor(filterSampleArray(distSensor3, 10, 5));
+	msg[7] = longDistSensor(filterSampleArray(distSensor3, 10));
 	msg[8] = IDSENSOR5;
-	msg[9] = shortDistSensor(filterSampleArray(distSensor4, 10, 5));
+	msg[9] = shortDistSensor(filterSampleArray(distSensor4, 10));
 	msg[10] = IDSENSOR6;
-	msg[11] = shortDistSensor(filterSampleArray(distSensor5, 10, 5));
+	msg[11] = shortDistSensor(filterSampleArray(distSensor5, 10));
 	msg[12] = IDSENSOR7;
-	msg[13] = shortDistSensor(filterSampleArray(distSensor6, 10, 5));
+	msg[13] = shortDistSensor(filterSampleArray(distSensor6, 10));
 	msg[14] = IDSENSOR8;
-	msg[15] = shortDistSensor(filterSampleArray(distSensor7, 10, 5));
+	msg[15] = shortDistSensor(filterSampleArray(distSensor7, 10));
 	msg[16] = IDGYROSENSOR;
 	msg[17] = gyroData[currentGyroCell]&0b1111111100000000;//GYRO TODO fixa medelvärdesfilter
 	msg[18] = gyroData[currentGyroCell]&0b0000000011111111;//GYRO

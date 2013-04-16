@@ -24,10 +24,11 @@ volatile uint8_t distSensor7[NUMSAMPLES];
 
 void Init_distsensor(void);
 void changeDistSensor(uint8_t ch);
-uint8_t filterSampleArray(volatile uint8_t *samples, uint8_t numOfSamples, uint8_t threshold);
+uint8_t filterSampleArray(volatile uint8_t *samples, uint8_t numOfSamples);
 uint8_t longDistSensor(uint8_t sample);
 uint8_t shortDistSensor(uint8_t sample);
 
 uint8_t absDist(uint8_t a1, uint8_t a2);
+
 
 #endif /* DISTSENSOR_H_ */
