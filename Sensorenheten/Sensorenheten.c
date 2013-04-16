@@ -44,7 +44,7 @@ int main(void)
 	uint8_t type;
 	while(1)
 	{
-		if(!SPI_SLAVE_read(msg, &type, &len))
+		if(SPI_SLAVE_read(msg, &type, &len))//om det finns ett helt medelande
 		{
 			switch (type)
 			{
