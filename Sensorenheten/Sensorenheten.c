@@ -74,8 +74,9 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 	msg[14] = IDSENSOR8;
 	msg[15] = shortDistSensor(filterSampleArray(distSensor7, 10));
 	msg[16] = IDGYROSENSOR;
-	msg[17] = gyroData[currentGyroCell]&0b1111111100000000;//GYRO TODO fixa medelvärdesfilter
-	msg[18] = gyroData[currentGyroCell]&0b0000000011111111;//GYRO
+	uint16_t gyroMsg = gyroLookUp(gyroData[currentGyroCell]); //TODO fixa medelvärdesfilter
+	msg[17] = gyroMsg&0b1111111100000000;//GYRO 
+	msg[18] = gyroMsg&0b0000000011111111;//GYRO
 	msg[19] = IDSPEEDRIGHT;
 	msg[20] = calcVelocityRight();//rot höger cm/sek
 	msg[21] = IDSPEEDLEFT;
