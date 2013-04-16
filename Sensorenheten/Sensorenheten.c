@@ -12,6 +12,7 @@
 #include <util/delay.h>
 #include "Sensorenheten.h"
 #include "rotsensor.h"
+#include "gyro.h"
 #include "distsensor.h"
 #include "../../TSEA27-include/message.h"
 #include "../../TSEA27-include/SPI/mspi.h"
@@ -23,14 +24,7 @@ int main(void)
 	Init_distsensor();
 	SPI_SLAVE_init();
 	MSPI_init_master();
-
-	//timed interupt init	
-	TIMSK0 = (1<<OCIE0A);// Enable Interrupt TimerCounter0 Compare Match A (SIG_OUTPUT_COMPARE0A)
-	TCCR0A = (1<<WGM01); // Mode = CTC, clear on compare, dvs reseta räknaren
-	TCCR0B = (1<<CS02)|(0<<CS01)|(1<<CS00);// Clock/1024, 0.000128 seconds per tick
-	OCR0A = 0.02f/0.000128f; // 0.2f/0.000128f ger 50 gånger i sekunden 1/50= 0.02
-	currentGyroCell = 0;
-	//end timed interupt init
+	Init_gyro();
 	
 	sei();//enable interupts
 
@@ -58,36 +52,7 @@ int main(void)
 	return 0;
 }
 
-//timed interup
-ISR(TIM0_COMPA_vect)
-{
-	//gyro data
-	uint8_t receivedData1;
-	uint8_t receivedData2;
 
-	MSPI_SS_LOW;
-	MSPI_exchange(0b10010100);
-	receivedData1=MSPI_exchange(0b00000000);
-	receivedData2=MSPI_exchange(0b00000000);
-	
-	MSPI_exchange(0b10010100);
-	receivedData1=MSPI_exchange(0b00000000);
-	receivedData2=MSPI_exchange(0b00000000);
-	
-	
-	MSPI_exchange(0b10000000);
-	receivedData1=MSPI_exchange(0b00000000);
-	receivedData2=MSPI_exchange(0b00000000);
-	MSPI_SS_HIGH;
-	
-	currentGyroCell++;
-	if(NUMGYROSAMPLES<=currentGyroCell)
-	{
-		currentGyroCell=0;
-	}
-	gyroData[currentGyroCell]=(((uint16_t)receivedData1)<<8)|(uint16_t)receivedData2;
-	
-}
 
 void constructSensorMessage(uint8_t *msg, uint8_t *len)
 {
@@ -112,7 +77,7 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 	msg[17] = gyroData[currentGyroCell]&0b1111111100000000;//GYRO TODO fixa medelvärdesfilter
 	msg[18] = gyroData[currentGyroCell]&0b0000000011111111;//GYRO
 	msg[19] = IDSPEEDRIGHT;
-	msg[20] = calcVelocityRight();//rot höger	cm/sek
+	msg[20] = calcVelocityRight();//rot höger cm/sek
 	msg[21] = IDSPEEDLEFT;
 	msg[22] = calcVelocityLeft();//rot vänster cm/sek
 }

@@ -124,6 +124,12 @@
     <Compile Include="distsensor.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="gyro.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="gyro.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="rotsensor.c">
       <SubType>compile</SubType>
     </Compile>
