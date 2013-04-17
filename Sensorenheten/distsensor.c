@@ -11,8 +11,8 @@
 #define MAXIMUMVALUESHORT 255
 #define MINIMUMVALUESHORT 0
 
-uint8_t currentDistSensor=0;
-uint8_t currentSample=0;
+volatile uint8_t currentDistSensor=0;
+volatile uint8_t currentSample=0;
 
 uint8_t lookUpShortSensor[255] = {
 	255,
@@ -535,12 +535,7 @@ void Init_distsensor(void)
 	ADMUX=(1<<REFS0)|(1 << ADLAR);	// AVcc with external capacitor at AREF, ADLAR left adjust res, ADCL innehåller två minsta bitarna, ADCH de andra 8a
 	ADCSRA=(1<<ADEN)|(1<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);//AD ENABLED, INTERUPT, 128 div factor ADC Prescaler Selections, p. 257
 	ADCSRA |= (1<<ADSC); //börja ny omvandling
-}
-
-void changeDistSensor(uint8_t ch)
-{
-	ch= ch & 0b00000111;// channel must be b/w 0 to 7
-	ADMUX |= ch;// selecting channel
+	
 }
 
 uint8_t filterSampleArray(volatile uint8_t *samples, uint8_t numOfSamples)
@@ -558,6 +553,7 @@ uint8_t filterSampleArray(volatile uint8_t *samples, uint8_t numOfSamples)
 
 uint8_t longDistSensor(uint8_t sample)
 {
+	
 	// ska hantera om sample är utanför look up tables intervall
 	if(MAXIMUMVALUELONG<sample)
 	{
@@ -578,6 +574,7 @@ uint8_t longDistSensor(uint8_t sample)
 
 uint8_t shortDistSensor(uint8_t sample)
 {
+	
 	// ska hantera om sample är utanför look up tables intervall
 	if(MAXIMUMVALUESHORT<sample)
 	{
@@ -598,51 +595,57 @@ uint8_t shortDistSensor(uint8_t sample)
 
 ISR(ADC_vect)
 {
-	uint8_t nextDistSensor;
+	uint8_t nextDistSensor = currentDistSensor;
+	volatile uint8_t test;
 	currentSample++;//uppdatera precis innan så den alltid pekar på senaste värdet
 	if(NUMSAMPLES<currentSample)
 	{
+		test++;
 		currentSample=0;
 		nextDistSensor = currentDistSensor+1;//next sensor
-		changeDistSensor(nextDistSensor);//update ad mux
+		ADMUX=(0b11111000&ADMUX)|(0b00000111&nextDistSensor);//update ad mux
 	}
 	switch (currentDistSensor)
 	{
 		case 0:
-			distSensor0[currentSample]=ADC>>2;
+			distSensor0[currentSample]=ADCL;
+			distSensor0[currentSample]=ADCH;
 			break;
 		case 1:
-			distSensor1[currentSample]=ADC>>2;
+			distSensor1[currentSample]=ADCL;
+			distSensor1[currentSample]=ADCH;
 			break;
 		case 2:
-			distSensor2[currentSample]=ADC>>2;
+			distSensor2[currentSample]=ADCL;
+			distSensor2[currentSample]=ADCH;
 			break;
 		case 3:
-			distSensor3[currentSample]=ADC>>2;
+			distSensor3[currentSample]=ADCL;
+			distSensor3[currentSample]=ADCH;
 			break;
 		case 4:
-			distSensor4[currentSample]=ADC>>2;
+			distSensor4[currentSample]=ADCL;
+			distSensor4[currentSample]=ADCH;
 			break;
 		case 5:
-			distSensor5[currentSample]=ADC>>2;
+			distSensor5[currentSample]=ADCL;
+			distSensor5[currentSample]=ADCH;
 			break;
 		case 6:
-			distSensor6[currentSample]=ADC>>2;
+			distSensor6[currentSample]=ADCL;
+			distSensor6[currentSample]=ADCH;
 			break;
 		case 7:
-			distSensor7[currentSample]=ADC>>2;
+			distSensor7[currentSample]=ADCL;
+			distSensor7[currentSample]=ADCH;
 			break;
-		default:
-			currentDistSensor=0;//reset
-			currentSample=0;
-			changeDistSensor(currentDistSensor);//update ad mux
-			//detta buggar dock bort currentSample=0;
 	}
 	if(7<nextDistSensor)
 	{
 		nextDistSensor=0;
-		changeDistSensor(nextDistSensor);//update ad mux
+		ADMUX=(0b11111000&ADMUX)|(0b00000111&nextDistSensor);//update ad mux
 	}
+
 	currentDistSensor=nextDistSensor;
 	ADCSRA |= (1<<ADSC); //börja ny omvandling
 }
