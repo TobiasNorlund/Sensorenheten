@@ -30,22 +30,62 @@ void Init_distsensor(void)
 	
 }
 
-uint16_t filterSampleArray(volatile uint16_t *samples, uint8_t numOfSamples)
+uint16_t filterSampleArray(volatile uint16_t  *samples, uint8_t numOfSamples)
 {
-	uint16_t globalMin = 0xFFFF;
-	for(uint8_t i = 0; i < numOfSamples; i++)
+	#define threshold 10
+	uint8_t maxNumInRow=0;
+	uint8_t currentNumInRow=0;
+	uint16_t currentSum=0;
+	uint16_t bestSum=0;
+	uint16_t currentSample=0;
+	uint16_t nu1=samples[0];
+	for(uint8_t i = 0; i < numOfSamples-1; i++)
 	{
-		if(globalMin > samples[i])
+		currentSample=samples[i];
+		if(absDist(samples[i], samples[i+1]) < threshold)
 		{
-			globalMin = samples[i];
+			currentNumInRow++;
+			currentSum+=samples[i];//summera
+		}
+		else
+		{
+			if(maxNumInRow<=currentNumInRow)
+			{
+				bestSum=currentSum+samples[i];
+				maxNumInRow=currentNumInRow;
+			}
+			currentNumInRow=0;
+		}
+		if(maxNumInRow<=currentNumInRow)
+		{
+			if(!(i < numOfSamples-2))//sista
+			{
+				bestSum=currentSum+samples[i+1];
+			}
+			else
+			{
+				bestSum=currentSum;
+			}
+			maxNumInRow=currentNumInRow;
 		}
 	}
-	return globalMin;	
+	return (uint16_t)(bestSum/(maxNumInRow+1));//return result
+}
+
+uint16_t absDist(uint16_t a1, uint16_t a2)
+{
+  if(a1 < a2)
+  {
+    return a2-a1;
+  }
+  else
+  {
+    return a1-a2;
+  }
 }
 
 uint8_t longDistSensor(uint16_t sample)
 {
-	
 	// ska hantera om sample är utanför look up tables intervall
 	if(MAXIMUMVALUELONG<sample)
 	{
@@ -65,7 +105,6 @@ uint8_t longDistSensor(uint16_t sample)
 
 uint8_t shortDistSensor(uint16_t sample)
 {
-	
 	// ska hantera om sample är utanför look up tables intervall
 	if(MAXIMUMVALUESHORT<sample)
 	{
@@ -85,11 +124,10 @@ uint8_t shortDistSensor(uint16_t sample)
 
 ISR(ADC_vect)
 {
-	testbajs2 = ADC;
 	uint8_t nextDistSensor = currentDistSensor;
 
 	currentSample++;//uppdatera precis innan så den alltid pekar på senaste värdet
-	if(NUMSAMPLES<currentSample)
+	if(NUMSAMPLES==currentSample)
 	{
 		currentSample=0;
 		nextDistSensor = currentDistSensor+1;//next sensor

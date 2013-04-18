@@ -28,5 +28,6 @@ void changeDistSensor(uint8_t ch);
 uint16_t filterSampleArray(volatile uint16_t *samples, uint8_t numOfSamples);
 uint8_t longDistSensor(uint16_t sample);
 uint8_t shortDistSensor(uint16_t sample);
+uint16_t absDist(uint16_t a1, uint16_t a2);
 
 #endif /* DISTSENSOR_H_ */

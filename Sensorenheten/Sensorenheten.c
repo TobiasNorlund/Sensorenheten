@@ -63,21 +63,23 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 {
 	
 	//constuct sensor message
-	msg[0] = IDSENSOR1;
+	msg[0] = LONGFRONT;
 	msg[1] = longDistSensor(filterSampleArray(distSensor0, NUMSAMPLES));
-	msg[2] = IDSENSOR2;
-	msg[3] = longDistSensor(filterSampleArray(distSensor1, NUMSAMPLES));
-	msg[4] = IDSENSOR3;
+	msg[2] = LONGRIGHT;
+	uint16_t t1 = filterSampleArray(distSensor1, NUMSAMPLES);
+	uint8_t t2 = longDistSensor(t1);
+	msg[3] = t2;
+	msg[4] = LONGREAR;
 	msg[5] = longDistSensor(filterSampleArray(distSensor2, NUMSAMPLES));
-	msg[6] = IDSENSOR4;
+	msg[6] = LONGLEFT;
 	msg[7] = longDistSensor(filterSampleArray(distSensor3, NUMSAMPLES));
-	msg[8] = IDSENSOR5;
+	msg[8] = SHORTFRONTRIGHT;
 	msg[9] = shortDistSensor(filterSampleArray(distSensor4, NUMSAMPLES));
-	msg[10] = IDSENSOR6;
+	msg[10] = SHORTFRONTLEFT;
 	msg[11] = shortDistSensor(filterSampleArray(distSensor5, NUMSAMPLES));
-	msg[12] = IDSENSOR7;
+	msg[12] = SHORTREARRIGHT;
 	msg[13] = shortDistSensor(filterSampleArray(distSensor6, NUMSAMPLES));
-	msg[14] = IDSENSOR8;
+	msg[14] = SHORTREARLEFT;
 	msg[15] = shortDistSensor(filterSampleArray(distSensor7, NUMSAMPLES));
 	msg[16] = IDGYROSENSOR;
 	uint16_t gyroMsg = gyroLookUp(gyroData[currentGyroCell]); //TODO fixa medelvärdesfilter
