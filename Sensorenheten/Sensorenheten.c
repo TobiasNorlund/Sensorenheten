@@ -36,8 +36,11 @@ int main(void)
 	uint8_t msg[16];
 	uint8_t len;
 	uint8_t type;
+	
 	while(1)
 	{
+		constructSensorMessage(msgR,&lenR);
+		
 		if(SPI_SLAVE_read(msg, &type, &len))//om det finns ett helt medelande
 		{
 			switch (type)
@@ -56,6 +59,7 @@ int main(void)
 
 void constructSensorMessage(uint8_t *msg, uint8_t *len)
 {
+	
 	//constuct sensor message
 	msg[0] = IDSENSOR1;
 	msg[1] = longDistSensor(filterSampleArray(distSensor0, 10));
@@ -75,8 +79,8 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 	msg[15] = shortDistSensor(filterSampleArray(distSensor7, 10));
 	msg[16] = IDGYROSENSOR;
 	uint16_t gyroMsg = gyroLookUp(gyroData[currentGyroCell]); //TODO fixa medelvärdesfilter
-	msg[17] = gyroMsg&0b1111111100000000;//GYRO 
-	msg[18] = gyroMsg&0b0000000011111111;//GYRO
+	msg[17] = (gyroMsg&0xFF00)>>8;//GYRO 
+	msg[18] = gyroMsg&0x00FF;//GYRO
 	msg[19] = IDSPEEDRIGHT;
 	msg[20] = calcVelocityRight();//rot höger cm/sek
 	msg[21] = IDSPEEDLEFT;

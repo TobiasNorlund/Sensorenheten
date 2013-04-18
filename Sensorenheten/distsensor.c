@@ -558,17 +558,18 @@ uint8_t longDistSensor(uint8_t sample)
 	if(MAXIMUMVALUELONG<sample)
 	{
 		//look up MAXIMUMVALUELONG in look up table
-		return lookUpLongSensor[255];
+		return 255;
 	}
 	else if(sample<MINIMUMVALUELONG)
 	{
 		//look up MINIMUMVALUELONG in look up table
-		return lookUpShortSensor[0];
+		return 0;
 	}
 	else
 	{
 		return lookUpLongSensor[sample];
 	}
+	
 	return sample;//TODO
 }
 
@@ -579,12 +580,12 @@ uint8_t shortDistSensor(uint8_t sample)
 	if(MAXIMUMVALUESHORT<sample)
 	{
 		//look up MAXIMUMVALUESHORT in look up table
-		return lookUpShortSensor[255];
+		return 255;
 	}
 	else if(sample<MINIMUMVALUESHORT)
 	{
 		//look up MINIMUMVALUESHORT in look up table
-		return lookUpShortSensor[0];
+		return 0;
 	}
 	else
 	{
