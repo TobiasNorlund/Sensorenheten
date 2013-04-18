@@ -37,11 +37,8 @@ uint16_t filterSampleArray(volatile uint16_t  *samples, uint8_t numOfSamples)
 	uint8_t currentNumInRow=0;
 	uint16_t currentSum=0;
 	uint16_t bestSum=0;
-	uint16_t currentSample=0;
-	uint16_t nu1=samples[0];
 	for(uint8_t i = 0; i < numOfSamples-1; i++)
 	{
-		currentSample=samples[i];
 		if(absDist(samples[i], samples[i+1]) < threshold)
 		{
 			currentNumInRow++;
