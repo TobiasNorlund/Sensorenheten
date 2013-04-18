@@ -12,10 +12,11 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
+#include <avr/pgmspace.h>
 
 #include "../../TSEA27-include/SPI/mspi.h"
 
-#define NUMGYROSAMPLES 10
+#define NUMGYROSAMPLES 5
 volatile uint8_t currentGyroCell;
 volatile uint16_t gyroData[NUMGYROSAMPLES];
 

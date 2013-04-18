@@ -6,460 +6,33 @@
  */ 
 #include "distsensor.h"
 
-#define MAXIMUMVALUELONG 266 //TODO UPDATE
-#define MINIMUMVALUELONG 43
-#define MAXIMUMVALUESHORT 246
-#define MINIMUMVALUESHORT 41
+#define MAXIMUMVALUELONG 553 //TODO UPDATE
+#define MINIMUMVALUELONG 82
+#define MAXIMUMVALUESHORT 492
+#define MINIMUMVALUESHORT 80
 
 volatile uint8_t currentDistSensor=0;
 volatile uint8_t currentSample=0;
+volatile uint8_t testbajs2;
 
-//41-246 proper values
-uint8_t lookUpShortSensor[205] = {
-	80,
-	78,
-	76,
-	74,
-	72,
-	70,
-	68,
-	66,
-	65,
-	63,
-	62,
-	60,
-	59,
-	58,
-	57,
-	55,
-	54,
-	53,
-	52,
-	51,
-	50,
-	49,
-	48,
-	47,
-	46,
-	46,
-	45,
-	44,
-	43,
-	43,
-	42,
-	41,
-	41,
-	40,
-	39,
-	39,
-	38,
-	37,
-	37,
-	36,
-	36,
-	35,
-	35,
-	34,
-	34,
-	33,
-	33,
-	33,
-	32,
-	32,
-	31,
-	31,
-	30,
-	30,
-	30,
-	29,
-	29,
-	29,
-	28,
-	28,
-	28,
-	27,
-	27,
-	27,
-	26,
-	26,
-	26,
-	26,
-	25,
-	25,
-	25,
-	24,
-	24,
-	24,
-	24,
-	23,
-	23,
-	23,
-	23,
-	23,
-	22,
-	22,
-	22,
-	22,
-	21,
-	21,
-	21,
-	21,
-	21,
-	21,
-	20,
-	20,
-	20,
-	20,
-	20,
-	19,
-	19,
-	19,
-	19,
-	19,
-	19,
-	18,
-	18,
-	18,
-	18,
-	18,
-	18,
-	18,
-	17,
-	17,
-	17,
-	17,
-	17,
-	17,
-	17,
-	17,
-	16,
-	16,
-	16,
-	16,
-	16,
-	16,
-	16,
-	16,
-	16,
-	15,
-	15,
-	15,
-	15,
-	15,
-	15,
-	15,
-	15,
-	15,
-	14,
-	14,
-	14,
-	14,
-	14,
-	14,
-	14,
-	14,
-	14,
-	14,
-	14,
-	13,
-	13,
-	13,
-	13,
-	13,
-	13,
-	13,
-	13,
-	13,
-	13,
-	13,
-	13,
-	13,
-	12,
-	12,
-	12,
-	12,
-	12,
-	12,
-	12,
-	12,
-	12,
-	12,
-	12,
-	12,
-	12,
-	12,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	11,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10,
-	10
+
+const uint8_t lookUpShortSensor[412] PROGMEM = {//MULTFAC = 2
+165, 162, 160, 158, 156, 153, 151, 149, 147, 145, 143, 142, 140, 138, 136, 135, 133, 131, 130, 128, 127, 125, 124, 122, 121, 120, 118, 117, 116, 114, 113, 112, 111, 110, 109, 107, 106, 105, 104, 103, 102, 101, 100, 99, 98, 97, 96, 96, 95, 94, 93, 92, 91, 91, 90, 89, 88, 87, 87, 86, 85, 85, 84, 83, 82, 82, 81, 80, 80, 79, 79, 78, 77, 77, 76, 76, 75, 74, 74, 73, 73, 72, 72, 71, 71, 70, 70, 69, 69, 68, 68, 67, 67, 66, 66, 66, 65, 65, 64, 64, 63, 63, 63, 62, 62, 61, 61, 61, 60, 60, 59, 59, 59, 58, 58, 58, 57, 57, 57, 56, 56, 56, 55, 55, 55, 54, 54, 54, 53, 53, 53, 53, 52, 52, 52, 51, 51, 51, 51, 50, 50, 50, 50, 49, 49, 49, 48, 48, 48, 48, 47, 47, 47, 47, 47, 46, 46, 46, 46, 45, 45, 45, 45, 45, 44, 44, 44, 44, 43, 43, 43, 43, 43, 42, 42, 42, 42, 42, 41, 41, 41, 41, 41, 41, 40, 40, 40, 40, 40, 39, 39, 39, 39, 39, 39, 38, 38, 38, 38, 38, 38, 38, 37, 37, 37, 37, 37, 37, 36, 36, 36, 36, 36, 36, 36, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34, 34, 34, 34, 34, 34, 33, 33, 33, 33, 33, 33, 33, 33, 32, 32, 32, 32, 32, 32, 32, 32, 31, 31, 31, 31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 19, 19, 19,
 };	
-uint8_t lookUpLongSensor[223] = {
-	150,
-	147,
-	144,
-	142,
-	139,
-	137,
-	134,
-	132,
-	129,
-	127,
-	125,
-	123,
-	121,
-	119,
-	117,
-	115,
-	113,
-	111,
-	109,
-	107,
-	105,
-	104,
-	102,
-	101,
-	99,
-	97,
-	96,
-	95,
-	93,
-	92,
-	90,
-	89,
-	88,
-	87,
-	85,
-	84,
-	83,
-	82,
-	81,
-	80,
-	79,
-	78,
-	77,
-	76,
-	75,
-	74,
-	73,
-	72,
-	71,
-	71,
-	70,
-	69,
-	68,
-	67,
-	67,
-	66,
-	65,
-	64,
-	64,
-	63,
-	62,
-	62,
-	61,
-	60,
-	60,
-	59,
-	59,
-	58,
-	57,
-	57,
-	56,
-	56,
-	55,
-	55,
-	54,
-	54,
-	53,
-	53,
-	52,
-	52,
-	51,
-	51,
-	50,
-	50,
-	50,
-	49,
-	49,
-	48,
-	48,
-	48,
-	47,
-	47,
-	46,
-	46,
-	46,
-	45,
-	45,
-	45,
-	44,
-	44,
-	44,
-	43,
-	43,
-	43,
-	42,
-	42,
-	42,
-	41,
-	41,
-	41,
-	40,
-	40,
-	40,
-	40,
-	39,
-	39,
-	39,
-	39,
-	38,
-	38,
-	38,
-	38,
-	37,
-	37,
-	37,
-	37,
-	36,
-	36,
-	36,
-	36,
-	35,
-	35,
-	35,
-	35,
-	35,
-	34,
-	34,
-	34,
-	34,
-	34,
-	33,
-	33,
-	33,
-	33,
-	33,
-	32,
-	32,
-	32,
-	32,
-	32,
-	31,
-	31,
-	31,
-	31,
-	31,
-	31,
-	30,
-	30,
-	30,
-	30,
-	30,
-	30,
-	29,
-	29,
-	29,
-	29,
-	29,
-	29,
-	29,
-	28,
-	28,
-	28,
-	28,
-	28,
-	28,
-	28,
-	27,
-	27,
-	27,
-	27,
-	27,
-	27,
-	27,
-	27,
-	26,
-	26,
-	26,
-	26,
-	26,
-	26,
-	26,
-	26,
-	25,
-	25,
-	25,
-	25,
-	25,
-	25,
-	25,
-	25,
-	25,
-	24,
-	24,
-	24,
-	24,
-	24,
-	24,
-	24,
-	24,
-	24,
-	24,
-	23,
-	23,
-	23,
-	23,
-	23,
-	23,
-	23,
-	23,
-	23,
-	23,
-	22,
-	22,
-	22,
+const uint8_t lookUpLongSensor[471] PROGMEM = {
+155, 154, 153, 151, 150, 149, 147, 146, 145, 143, 142, 141, 139, 138, 137, 136, 134, 133, 132, 131, 130, 128, 127, 126, 125, 124, 123, 122, 121, 120, 119, 118, 117, 116, 115, 114, 113, 112, 111, 110, 109, 108, 107, 106, 106, 105, 104, 103, 102, 101, 101, 100, 99, 98, 98, 97, 96, 95, 95, 94, 93, 93, 92, 91, 91, 90, 89, 89, 88, 87, 87, 86, 86, 85, 84, 84, 83, 83, 82, 82, 81, 81, 80, 79, 79, 78, 78, 77, 77, 76, 76, 76, 75, 75, 74, 74, 73, 73, 72, 72, 71, 71, 71, 70, 70, 69, 69, 69, 68, 68, 67, 67, 67, 66, 66, 66, 65, 65, 64, 64, 64, 63, 63, 63, 62, 62, 62, 61, 61, 61, 60, 60, 60, 60, 59, 59, 59, 58, 58, 58, 58, 57, 57, 57, 56, 56, 56, 56, 55, 55, 55, 55, 54, 54, 54, 54, 53, 53, 53, 53, 52, 52, 52, 52, 51, 51, 51, 51, 51, 50, 50, 50, 50, 49, 49, 49, 49, 49, 48, 48, 48, 48, 48, 47, 47, 47, 47, 47, 46, 46, 46, 46, 46, 46, 45, 45, 45, 45, 45, 44, 44, 44, 44, 44, 44, 43, 43, 43, 43, 43, 43, 42, 42, 42, 42, 42, 42, 42, 41, 41, 41, 41, 41, 41, 41, 40, 40, 40, 40, 40, 40, 40, 39, 39, 39, 39, 39, 39, 39, 38, 38, 38, 38, 38, 38, 38, 38, 37, 37, 37, 37, 37, 37, 37, 37, 36, 36, 36, 36, 36, 36, 36, 36, 36, 35, 35, 35, 35, 35, 35, 35, 35, 35, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 21, 21,
 };
 void Init_distsensor(void)
 {
-	ADMUX=(1<<REFS0)|(1 << ADLAR);	// AVcc with external capacitor at AREF, ADLAR left adjust res, ADCL innehåller två minsta bitarna, ADCH de andra 8a
+	ADMUX=(1<<REFS0);	// AVcc with external capacitor at AREF
 	ADCSRA=(1<<ADEN)|(1<<ADIE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);//AD ENABLED, INTERUPT, 128 div factor ADC Prescaler Selections, p. 257
 	ADCSRA |= (1<<ADSC); //börja ny omvandling
 	
 }
 
-uint8_t filterSampleArray(volatile uint16_t *samples, uint8_t numOfSamples)
+uint16_t filterSampleArray(volatile uint16_t *samples, uint8_t numOfSamples)
 {
-	uint8_t globalMin = 255;
+	uint16_t globalMin = 0xFFFF;
 	for(uint8_t i = 0; i < numOfSamples; i++)
 	{
 		if(globalMin > samples[i])
@@ -470,7 +43,7 @@ uint8_t filterSampleArray(volatile uint16_t *samples, uint8_t numOfSamples)
 	return globalMin;	
 }
 
-uint8_t longDistSensor(uint8_t sample)
+uint8_t longDistSensor(uint16_t sample)
 {
 	
 	// ska hantera om sample är utanför look up tables intervall
@@ -486,13 +59,11 @@ uint8_t longDistSensor(uint8_t sample)
 	}
 	else
 	{
-		return lookUpLongSensor[sample-43];
+		return  pgm_read_byte(&(lookUpLongSensor[sample-MINIMUMVALUELONG]));
 	}
-	
-	return sample;//TODO
 }
 
-uint8_t shortDistSensor(uint8_t sample)
+uint8_t shortDistSensor(uint16_t sample)
 {
 	
 	// ska hantera om sample är utanför look up tables intervall
@@ -508,19 +79,18 @@ uint8_t shortDistSensor(uint8_t sample)
 	}
 	else
 	{
-		return lookUpShortSensor[sample-41];
+		return  pgm_read_byte(&(lookUpShortSensor[sample-MINIMUMVALUESHORT]));
 	}
-	return sample;//TODO
 }
 
 ISR(ADC_vect)
 {
+	testbajs2 = ADC;
 	uint8_t nextDistSensor = currentDistSensor;
-	volatile uint8_t test;
+
 	currentSample++;//uppdatera precis innan så den alltid pekar på senaste värdet
 	if(NUMSAMPLES<currentSample)
 	{
-		test++;
 		currentSample=0;
 		nextDistSensor = currentDistSensor+1;//next sensor
 		ADMUX=(0b11111000&ADMUX)|(0b00000111&nextDistSensor);//update ad mux
@@ -528,44 +98,30 @@ ISR(ADC_vect)
 	switch (currentDistSensor)
 	{
 		case 0:
-			distSensor0[currentSample]=ADCL;
-			distSensor0[currentSample] << 1;
-			distSensor0[currentSample]=distSensor0[currentSample]|ADCH;
+			distSensor0[currentSample]=ADC;
 			break;
 		case 1:
-			distSensor1[currentSample]=ADCL;
-			distSensor1[currentSample] << 1;
-			distSensor1[currentSample]=distSensor1[currentSample]|ADCH;
+			distSensor1[currentSample]=ADC;
 			break;
 		case 2:
-			distSensor2[currentSample]=ADCL;
-			distSensor2[currentSample] << 1;
-			distSensor2[currentSample]=distSensor2[currentSample]|ADCH;
+			distSensor2[currentSample]=ADC;
 			break;
 		case 3:
-			distSensor3[currentSample]=ADCL;
-			distSensor3[currentSample] << 1;
-			distSensor3[currentSample]=distSensor3[currentSample]|ADCH;
+			distSensor3[currentSample]=ADC;
 			break;
 		case 4:
-			distSensor4[currentSample]=ADCL;
-			distSensor4[currentSample] << 1;
-			distSensor4[currentSample]=distSensor4[currentSample]|ADCH;
+			distSensor4[currentSample]=ADC;
 			break;
 		case 5:
-			distSensor5[currentSample]=ADCL;
-			distSensor5[currentSample] << 1;
-			distSensor5[currentSample]=distSensor5[currentSample]|ADCH;
+			distSensor5[currentSample]=ADC;
 			break;
 		case 6:
-			distSensor6[currentSample]=ADCL;
-			distSensor6[currentSample] << 1;
-			distSensor6[currentSample]=distSensor6[currentSample]|ADCH;
+			distSensor6[currentSample]=ADC;
 			break;
 		case 7:
-			distSensor7[currentSample]=ADCL;
-			distSensor7[currentSample] << 1;
-			distSensor7[currentSample]=distSensor7[currentSample]|ADCH;
+			distSensor7[currentSample]=ADC;
+			break;
+		default:
 			break;
 	}
 	if(7<nextDistSensor)

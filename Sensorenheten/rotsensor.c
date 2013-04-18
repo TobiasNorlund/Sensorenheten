@@ -6,7 +6,7 @@
  */ 
 #include "rotsensor.h"
 
-#define WHEELDIAM 6.5f // cm
+#define WHEELDIAM 6.3f // cm
 #define PI 3.14f 
 #define NUMBEROFSTRIPES 10
 /*
