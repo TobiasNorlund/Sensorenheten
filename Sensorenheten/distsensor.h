@@ -10,25 +10,24 @@
 #define DISTSENSOR_H_
 
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 
-#define NUMSAMPLES 10
+#define NUMSAMPLES 5
 
-volatile uint8_t distSensor0[NUMSAMPLES];
-volatile uint8_t distSensor1[NUMSAMPLES];
-volatile uint8_t distSensor2[NUMSAMPLES];
-volatile uint8_t distSensor3[NUMSAMPLES];
-volatile uint8_t distSensor4[NUMSAMPLES];
-volatile uint8_t distSensor5[NUMSAMPLES];
-volatile uint8_t distSensor6[NUMSAMPLES];
-volatile uint8_t distSensor7[NUMSAMPLES];
+volatile uint16_t distSensor0[NUMSAMPLES];
+volatile uint16_t distSensor1[NUMSAMPLES];
+volatile uint16_t distSensor2[NUMSAMPLES];
+volatile uint16_t distSensor3[NUMSAMPLES];
+volatile uint16_t distSensor4[NUMSAMPLES];
+volatile uint16_t distSensor5[NUMSAMPLES];
+volatile uint16_t distSensor6[NUMSAMPLES];
+volatile uint16_t distSensor7[NUMSAMPLES];
 
 void Init_distsensor(void);
 void changeDistSensor(uint8_t ch);
-uint8_t filterSampleArray(volatile uint8_t *samples, uint8_t numOfSamples);
-uint8_t longDistSensor(uint8_t sample);
-uint8_t shortDistSensor(uint8_t sample);
-
-uint8_t absDist(uint8_t a1, uint8_t a2);
-
+uint16_t filterSampleArray(volatile uint16_t *samples, uint8_t numOfSamples);
+uint8_t longDistSensor(uint16_t sample);
+uint8_t shortDistSensor(uint16_t sample);
+uint16_t absDist(uint16_t a1, uint16_t a2);
 
 #endif /* DISTSENSOR_H_ */
