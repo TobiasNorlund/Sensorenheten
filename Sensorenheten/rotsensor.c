@@ -79,7 +79,7 @@ uint8_t calcVelocityLeft(void)
 ISR(PCINT3_vect)
 {
 	CurrentRightSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
-	if(NUMSAMPLES<=CurrentRightSensor)
+	if(NUMROTSAMPLES<=CurrentRightSensor)
 	{
 		CurrentRightSensor=0;
 	}
@@ -92,7 +92,7 @@ ISR(PCINT3_vect)
 ISR(PCINT2_vect)
 {
 	CurrentLeftSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
-	if(NUMSAMPLES<=CurrentLeftSensor)
+	if(NUMROTSAMPLES<=CurrentLeftSensor)
 	{
 		CurrentLeftSensor=0;
 	}

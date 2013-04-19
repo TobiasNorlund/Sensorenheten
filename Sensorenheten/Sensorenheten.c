@@ -5,11 +5,9 @@
  *  Author: tobno568
  */ 
 
-#define F_CPU 8000000UL // 8mhz 
-
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <util/delay.h>
+
 #include "Sensorenheten.h"
 #include "rotsensor.h"
 #include "gyro.h"
@@ -19,10 +17,13 @@
 #include "../../TSEA27-include/SPI/mspi.h"
 #include "../../TSEA27-include/SPI/spi_slave.h"
 
+#define F_CPU 8000000UL // 8mhz
+#include <util/delay.h>
+
 uint8_t test[32];
 
-volatile uint8_t timer0_Overflow;
-#define GET_TIMESTAMP (((uint16_t)timer0_Overflow << 8)|(uint16_t)TCNT0)
+volatile uint8_t timer2_Overflow;
+#define GET_TIMESTAMP (((uint16_t)timer2_Overflow << 8)|(uint16_t)TCNT0)
 
 int main(void)
 {	
@@ -32,10 +33,10 @@ int main(void)
 	MSPI_init_master();
 	Init_gyro();
 	// init 8 sek /16 bit timestamp
-	TCCR0B=(1<<CS10)|(0<<CS11)|(1<<CS12);//clk/1024 (From prescaler)
-	TIMSK0=(1<<TOIE0);//overflow interupt
-	TCNT0=0;//init value for counter 0
-	timer0_Overflow=0;
+	TCCR2B=(1<<CS10)|(0<<CS11)|(1<<CS12);//clk/1024 (From prescaler)
+	TIMSK2=(1<<TOIE2);//overflow interupt
+	TCNT2=0;//init value for counter 0
+	timer2_Overflow=0;
 	// end init 8 sek /16 bit timestamp
 	uint16_t autoCalibrateGyroTimestamp=0;
 	sei();//enable interupts
@@ -51,6 +52,7 @@ int main(void)
 	uint8_t msg[16];
 	uint8_t len;
 	uint8_t type;
+		
 	
 	while(1)
 	{
@@ -91,25 +93,25 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 {
 	//constuct sensor message
 	msg[0] = LONGFRONT;
-	msg[1] = longDistSensor(filterSampleArray(distSensor0, NUMSAMPLES));
+	msg[1] = longDistSensor(median(distSensor0, NUMSAMPLES));
 	msg[2] = LONGRIGHT;
-	uint16_t t1 = filterSampleArray(distSensor1, NUMSAMPLES);
+	uint16_t t1 = median(distSensor1, NUMSAMPLES);
 	uint8_t t2 = longDistSensor(t1);
 	msg[3] = t2;
 	msg[4] = LONGREAR;
-	msg[5] = longDistSensor(filterSampleArray(distSensor2, NUMSAMPLES));
+	msg[5] = longDistSensor(median(distSensor2, NUMSAMPLES));
 	msg[6] = LONGLEFT;
-	msg[7] = longDistSensor(filterSampleArray(distSensor3, NUMSAMPLES));
+	msg[7] = longDistSensor(median(distSensor3, NUMSAMPLES));
 	msg[8] = SHORTFRONTRIGHT;
-	msg[9] = shortDistSensor(filterSampleArray(distSensor4, NUMSAMPLES));
+	msg[9] = shortDistSensor(median(distSensor4, NUMSAMPLES));
 	msg[10] = SHORTFRONTLEFT;
-	msg[11] = shortDistSensor(filterSampleArray(distSensor5, NUMSAMPLES));
+	msg[11] = shortDistSensor(median(distSensor5, NUMSAMPLES));
 	msg[12] = SHORTREARRIGHT;
-	msg[13] = shortDistSensor(filterSampleArray(distSensor6, NUMSAMPLES));
+	msg[13] = shortDistSensor(median(distSensor6, NUMSAMPLES));
 	msg[14] = SHORTREARLEFT;
-	msg[15] = shortDistSensor(filterSampleArray(distSensor7, NUMSAMPLES));
+	msg[15] = shortDistSensor(median(distSensor7, NUMSAMPLES));
 	msg[16] = IDGYROSENSOR;
-	uint16_t gyroMsg = gyroLookUp(filterSampleArrayMeanPlusPlus(gyroData[currentGyroCell], NUMGYROSAMPLES, 5));
+	int16_t gyroMsg = gyroLookUp(filterSampleArrayMeanPlusPlus(gyroData, NUMGYROSAMPLES, 5));
 	msg[17] = (gyroMsg&0xFF00)>>8;//GYRO 
 	msg[18] = gyroMsg&0x00FF;//GYRO
 	msg[19] = IDSPEEDRIGHT;
@@ -120,6 +122,6 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 	*len = 23;
 }
 
-ISR(TIMER0_OVF_vect) {
-	timer0_Overflow++;
+ISR(TIMER2_OVF_vect) {
+	timer2_Overflow++;
 }

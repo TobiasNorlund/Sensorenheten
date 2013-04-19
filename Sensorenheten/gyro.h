@@ -9,6 +9,8 @@
 #ifndef GYRO_H_
 #define GYRO_H_
 
+#include "globals.h"
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
@@ -26,7 +28,7 @@ int8_t gyroCaibration;
 void Init_gyro(void);
 int8_t calibrateGyro(int8_t maxCalibration);
 
-uint16_t gyroLookUp(uint16_t sample);
+int16_t gyroLookUp(uint16_t sample);
 
 
 #endif /* GYRO_H_ */
