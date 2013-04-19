@@ -88,16 +88,16 @@ int main(void)
 }
 
 
-
+//turn off optimization
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
 void constructSensorMessage(uint8_t *msg, uint8_t *len)
 {
 	//constuct sensor message
 	msg[0] = LONGFRONT;
 	msg[1] = longDistSensor(median(distSensor0, NUMSAMPLES));
 	msg[2] = LONGRIGHT;
-	uint16_t t1 = median(distSensor1, NUMSAMPLES);
-	uint8_t t2 = longDistSensor(t1);
-	msg[3] = t2;
+	msg[3] = longDistSensor(median(distSensor1, NUMSAMPLES));
 	msg[4] = LONGREAR;
 	msg[5] = longDistSensor(median(distSensor2, NUMSAMPLES));
 	msg[6] = LONGLEFT;
@@ -111,7 +111,8 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 	msg[14] = SHORTREARLEFT;
 	msg[15] = shortDistSensor(median(distSensor7, NUMSAMPLES));
 	msg[16] = IDGYROSENSOR;
-	int16_t gyroMsg = gyroLookUp(filterSampleArrayMeanPlusPlus(gyroData, NUMGYROSAMPLES, 5));
+	uint16_t tGyro = filterSampleArrayMeanPlusPlus(gyroData, NUMGYROSAMPLES,5);
+	int16_t gyroMsg = gyroLookUp(tGyro);
 	msg[17] = (gyroMsg&0xFF00)>>8;//GYRO 
 	msg[18] = gyroMsg&0x00FF;//GYRO
 	msg[19] = IDSPEEDRIGHT;
@@ -121,6 +122,7 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 	// sätt längd
 	*len = 23;
 }
+#pragma GCC pop_options
 
 ISR(TIMER2_OVF_vect) {
 	timer2_Overflow++;

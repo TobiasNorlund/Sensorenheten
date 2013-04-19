@@ -26,7 +26,7 @@ void Init_gyro(void)
 
 int8_t calibrateGyro(int8_t maxCalibration)
 {
-	uint16_t newZero = filterSampleArrayMeanPlusPlus(gyroData, NUMGYROSAMPLES, 5);
+	volatile uint16_t newZero = filterSampleArrayMeanPlusPlus(gyroData, NUMGYROSAMPLES, 5);
 	newZero=newZero-409-MINIMUMVALUEGYRO;
 	int8_t tempCaibration = (int8_t)newZero;
 
@@ -43,9 +43,13 @@ int8_t calibrateGyro(int8_t maxCalibration)
 
 }
 
+
+//turn off optimization 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
 int16_t gyroLookUp(uint16_t sample)
 {
-	sample=sample+gyroCaibration;
+	sample=sample-gyroCaibration;
 	// ska hantera om sample är utanför look up tables intervall
 	if(MAXIMUMVALUEGYRO<sample)
 	{
@@ -59,9 +63,11 @@ int16_t gyroLookUp(uint16_t sample)
 	}
 	else
 	{
-		return  pgm_read_byte(&(lookUpGyro[sample-MINIMUMVALUEGYRO]));
+		return  pgm_read_byte(&(lookUpGyro[sample-101]));
 	}
 }
+#pragma GCC pop_options
+//end turn off optimization 
 
 //timed interup
 ISR(TIMER0_COMPA_vect)

@@ -81,6 +81,9 @@ uint16_t absDist(uint16_t a1, uint16_t a2)
   }
 }
 
+//turn off optimization 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
 uint8_t longDistSensor(uint16_t sample)
 {
 	// ska hantera om sample är utanför look up tables intervall
@@ -118,6 +121,9 @@ uint8_t shortDistSensor(uint16_t sample)
 		return  pgm_read_byte(&(lookUpShortSensor[sample-MINIMUMVALUESHORT]));
 	}
 }
+#pragma GCC pop_options
+//end turn off optimization 
+
 
 ISR(ADC_vect)
 {
