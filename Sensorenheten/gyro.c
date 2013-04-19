@@ -29,7 +29,7 @@ int8_t calibrateGyro(int8_t maxCalibration)
 	int8_t tempCaibration = newZero-409-MINIMUMVALUEGYRO;
 
 	// Spara bara om det är mindre maxCalibration i skillnad från föregående kalibrering
-	if((tempCaibration < -1*maxCalibration+gyroCaibration) || tempCaibration > maxCalibration+gyroCaibration))
+	if((tempCaibration < -1*maxCalibration+gyroCaibration) || (tempCaibration > maxCalibration+gyroCaibration))
 	{
 		return 127;//error
 	}

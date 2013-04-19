@@ -33,7 +33,7 @@ int main(void)
 	Init_gyro();
 	// init 8 sek /16 bit timestamp
 	TCCR0B=(1<<CS10)|(0<<CS11)|(1<<CS12);//clk/1024 (From prescaler)
-	TIMS03=(1<<TOIE0);//overflow interupt
+	TIMSK0=(1<<TOIE0);//overflow interupt
 	TCNT0=0;//init value for counter 0
 	timer0_Overflow=0;
 	// end init 8 sek /16 bit timestamp
