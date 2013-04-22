@@ -53,7 +53,6 @@ int main(void)
 	uint8_t len;
 	uint8_t type;
 		
-	
 	while(1)
 	{
 		//constructSensorMessage(test,&lenR);
@@ -63,8 +62,8 @@ int main(void)
 			switch (type)
 			{
 				case TYPE_REQUEST_SENSOR_DATA:
-					constructSensorMessage(msgR, &lenR);
-					SPI_SLAVE_write(msgR, TYPE_REPLY_SENSOR_DATA, lenR);
+						constructSensorMessage(msgR, &lenR);
+						SPI_SLAVE_write(msgR, TYPE_REPLY_SENSOR_DATA, lenR);			
 					break;
 				case TYPE_CALIBRATE_GYRO:
 					msgR[0]=calibrateGyro(10);//return calibration
