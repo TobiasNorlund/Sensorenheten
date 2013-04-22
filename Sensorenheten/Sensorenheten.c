@@ -56,7 +56,7 @@ int main(void)
 	
 	while(1)
 	{
-		constructSensorMessage(test,&lenR);
+		//constructSensorMessage(test,&lenR);
 		
 		if(SPI_SLAVE_read(msg, &type, &len))//om det finns ett helt medelande
 		{
