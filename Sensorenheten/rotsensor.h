@@ -11,7 +11,7 @@
 
 #include <avr/interrupt.h>
 
-#define NUMSAMPLES 10
+#define NUMROTSAMPLES 10
 
 uint8_t rightOverflow;
 uint8_t leftOverflow;
@@ -19,11 +19,11 @@ uint8_t leftOverflow;
 volatile uint8_t CurrentRightSensor;
 volatile uint8_t CurrentLeftSensor;
 
-volatile uint16_t rightSensor[NUMSAMPLES];
-volatile uint16_t leftSensor[NUMSAMPLES];
+volatile uint16_t rightSensor[NUMROTSAMPLES];
+volatile uint16_t leftSensor[NUMROTSAMPLES];
 
-volatile uint8_t rightSensorOverFlow[NUMSAMPLES];
-volatile uint8_t leftSensorOverFlow[NUMSAMPLES];
+volatile uint8_t rightSensorOverFlow[NUMROTSAMPLES];
+volatile uint8_t leftSensorOverFlow[NUMROTSAMPLES];
 
 
 void Init_rotsensor(void);

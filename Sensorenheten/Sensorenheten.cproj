@@ -25,22 +25,22 @@
     <com_atmel_avrdbg_tool_jtagicemk3>
       <ToolType>com.atmel.avrdbg.tool.jtagicemk3</ToolType>
       <ToolName>JTAGICE3</ToolName>
-      <ToolNumber>J30200009017</ToolNumber>
+      <ToolNumber>J30200013091</ToolNumber>
       <KeepTimersRunning>true</KeepTimersRunning>
       <OverrideVtor>false</OverrideVtor>
       <OverrideVtorValue>
       </OverrideVtorValue>
       <Channel>
         <host>127.0.0.1</host>
-        <port>4736</port>
+        <port>3262</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>
         <InterfaceName>JTAG</InterfaceName>
         <InterfaceProperties>
-          <JtagDbgClock>250000</JtagDbgClock>
+          <JtagDbgClock>945860</JtagDbgClock>
           <JtagProgClock>1000000</JtagProgClock>
-          <IspClock>250000</IspClock>
+          <IspClock>150000</IspClock>
           <JtagInChain>false</JtagInChain>
           <JtagEnableExtResetOnStartSession>false</JtagEnableExtResetOnStartSession>
           <JtagDevicesBefore>0</JtagDevicesBefore>
@@ -95,6 +95,7 @@
         <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
         <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
         <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
         <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
         <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
         <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
@@ -109,6 +110,18 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\TSEA27-include\circularbuffer.c">
+      <SubType>compile</SubType>
+      <Link>circularbuffer.c</Link>
+    </Compile>
+    <Compile Include="..\..\TSEA27-include\circularbuffer.h">
+      <SubType>compile</SubType>
+      <Link>circularbuffer.h</Link>
+    </Compile>
+    <Compile Include="..\..\TSEA27-include\divisionfactor.h">
+      <SubType>compile</SubType>
+      <Link>divisionfactor.h</Link>
+    </Compile>
     <Compile Include="..\..\TSEA27-include\message.c">
       <SubType>compile</SubType>
       <Link>message.c</Link>
@@ -133,10 +146,21 @@
       <SubType>compile</SubType>
       <Link>spi_slave.h</Link>
     </Compile>
+    <Compile Include="..\..\TSEA27-include\utils.c">
+      <SubType>compile</SubType>
+      <Link>utils.c</Link>
+    </Compile>
+    <Compile Include="..\..\TSEA27-include\utils.h">
+      <SubType>compile</SubType>
+      <Link>utils.h</Link>
+    </Compile>
     <Compile Include="distsensor.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="distsensor.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="globals.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="gyro.c">
