@@ -16,10 +16,10 @@ const int16_t lookUpGyro[821] PROGMEM = {
 void Init_gyro(void)
 {
 	//timed interupt init
-	TIMSK0 = (1<<OCIE0A);// Enable Interrupt TimerCounter0 Compare Match A (SIG_OUTPUT_COMPARE0A)
+	//TIMSK0 = (1<<OCIE0A);// Enable Interrupt TimerCounter0 Compare Match A (SIG_OUTPUT_COMPARE0A)
 	TCCR0A = (1<<WGM01); // Mode = CTC, clear on compare, dvs reseta räknaren
 	TCCR0B = (1<<CS02)|(0<<CS01)|(1<<CS00);// Clock/1024, 0.000128 seconds per tick
-	OCR0A = 0.02f/0.000128f; // 0.2f/0.000128f ger 50 gånger i sekunden 1/50= 0.02
+	OCR0A = 255; // 0.2f/0.000128f ger 50 gånger i sekunden 1/50= 0.02
 	currentGyroCell = 0;
 	//end timed interupt init
 	gyroCaibration=0;
@@ -64,7 +64,8 @@ int16_t gyroLookUp(uint16_t sample)
 	}
 	else
 	{
-		return  pgm_read_byte(&(lookUpGyro[sample-MINIMUMVALUEGYRO]));
+		sample-=MINIMUMVALUEGYRO;
+		return  pgm_read_byte(&(lookUpGyro[sample]));
 	}
 }
 #pragma GCC pop_options
@@ -72,6 +73,11 @@ int16_t gyroLookUp(uint16_t sample)
 
 //timed interup
 ISR(TIMER0_COMPA_vect)
+{
+	updateGyroData();
+}
+
+void updateGyroData(void)
 {
 	//gyro data
 	uint8_t receivedData1;
@@ -91,7 +97,7 @@ ISR(TIMER0_COMPA_vect)
 	receivedData2=MSPI_exchange(0b00000000);
 
 	uint8_t i = 0;
-	while((!receivedData1&0b00100000)&&(i < 10))
+	while((!(receivedData1&0b00100000))&&(i < 10))
 	{
 		MSPI_exchange(0b10000000);
 		receivedData1=MSPI_exchange(0b00000000);
@@ -110,4 +116,4 @@ ISR(TIMER0_COMPA_vect)
 		}
 		gyroData[currentGyroCell]=((((uint16_t)receivedData1)<<8)|(uint16_t)receivedData2)>>2;
 	}
-}
+}	

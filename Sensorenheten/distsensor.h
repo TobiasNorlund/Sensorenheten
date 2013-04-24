@@ -14,14 +14,7 @@
 
 #define NUMSAMPLES 5
 
-volatile uint16_t distSensor0[NUMSAMPLES];
-volatile uint16_t distSensor1[NUMSAMPLES];
-volatile uint16_t distSensor2[NUMSAMPLES];
-volatile uint16_t distSensor3[NUMSAMPLES];
-volatile uint16_t distSensor4[NUMSAMPLES];
-volatile uint16_t distSensor5[NUMSAMPLES];
-volatile uint16_t distSensor6[NUMSAMPLES];
-volatile uint16_t distSensor7[NUMSAMPLES];
+volatile uint16_t distSensor[8][NUMSAMPLES];
 
 void Init_distsensor(void);
 void changeDistSensor(uint8_t ch);

@@ -9,7 +9,6 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
-#define F_CPU 8000000UL // 8mhz 
 
 
 

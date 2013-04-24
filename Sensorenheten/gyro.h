@@ -29,6 +29,7 @@ void Init_gyro(void);
 int8_t calibrateGyro(int8_t maxCalibration);
 
 int16_t gyroLookUp(uint16_t sample);
+void updateGyroData(void);
 
 
 #endif /* GYRO_H_ */

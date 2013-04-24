@@ -17,7 +17,7 @@
 #include "../../TSEA27-include/SPI/mspi.h"
 #include "../../TSEA27-include/SPI/spi_slave.h"
 
-#define F_CPU 8000000UL // 8mhz
+#define F_CPU 20000000UL // 20mhz
 #include <util/delay.h>
 
 uint8_t test[32];
@@ -71,12 +71,12 @@ int main(void)
 					break;
 			}			
 		}
-
+		updateGyroData();
 		// auto calibrate Gyro
 		// Om Höger och vänster hjul snurrar lika fort
 		// 0.000128 * 5 = 0.00064 sek
 		// och mer än 2 sek sedan senast.
-		if((absThreshold(rightSensor[CurrentRightSensor], leftSensor[CurrentLeftSensor]) < 5)&&(rightSensorOverFlow[CurrentRightSensor]==leftSensorOverFlow[CurrentLeftSensor])&&(2/0.000128f < absThreshold(autoCalibrateGyroTimestamp,GET_TIMESTAMP)))
+		if((absThreshold(rightSensor[CurrentRightSensor], leftSensor[CurrentLeftSensor]) < 5)&&(rightSensorOverFlow[CurrentRightSensor]==leftSensorOverFlow[CurrentLeftSensor])&&(2/0.0000512f < absThreshold(autoCalibrateGyroTimestamp,GET_TIMESTAMP)))
 		{
 			calibrateGyro(10);//max 10 i komp per gång vi kalibrerar
 			autoCalibrateGyroTimestamp=GET_TIMESTAMP;
@@ -94,25 +94,25 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 {
 	//constuct sensor message
 	msg[0] = LONGFRONT;
-	msg[1] = longDistSensor(median(distSensor0, NUMSAMPLES));
+	msg[1] = longDistSensor(median(distSensor[0], NUMSAMPLES));
 	msg[2] = LONGRIGHT;
-	msg[3] = longDistSensor(median(distSensor1, NUMSAMPLES));
+	msg[3] = longDistSensor(median(distSensor[1], NUMSAMPLES));
 	msg[4] = LONGREAR;
-	msg[5] = longDistSensor(median(distSensor2, NUMSAMPLES));
+	msg[5] = longDistSensor(median(distSensor[2], NUMSAMPLES));
 	msg[6] = LONGLEFT;
-	msg[7] = longDistSensor(median(distSensor3, NUMSAMPLES));
+	msg[7] = longDistSensor(median(distSensor[3], NUMSAMPLES));
 	msg[8] = SHORTFRONTRIGHT;
-	msg[9] = shortDistSensor(median(distSensor4, NUMSAMPLES));
+	msg[9] = shortDistSensor(median(distSensor[4], NUMSAMPLES));
 	msg[10] = SHORTFRONTLEFT;
-	msg[11] = shortDistSensor(median(distSensor5, NUMSAMPLES));
+	msg[11] = shortDistSensor(median(distSensor[5], NUMSAMPLES));
 	msg[12] = SHORTREARRIGHT;
-	msg[13] = shortDistSensor(median(distSensor6, NUMSAMPLES));
+	msg[13] = shortDistSensor(median(distSensor[6], NUMSAMPLES));
 	msg[14] = SHORTREARLEFT;
-	msg[15] = shortDistSensor(median(distSensor7, NUMSAMPLES));
+	msg[15] = shortDistSensor(median(distSensor[7], NUMSAMPLES));
 	msg[16] = IDGYROSENSOR;
 	uint16_t tGyro = filterSampleArrayMeanPlusPlus(gyroData, NUMGYROSAMPLES,5);
 	int16_t gyroMsg = gyroLookUp(tGyro);
-	msg[17] = (gyroMsg&0xFF00)>>8;//GYRO 
+	msg[17] = (gyroMsg>>8);//GYRO 
 	msg[18] = gyroMsg&0x00FF;//GYRO
 	msg[19] = IDSPEEDRIGHT;
 	msg[20] = calcVelocityRight();//rot höger cm/sek
