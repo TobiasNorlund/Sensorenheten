@@ -11,7 +11,7 @@
 
 #include <avr/interrupt.h>
 
-#define NUMROTSAMPLES 10
+#define NUMROTSAMPLES 25 //TEST
 
 uint8_t rightOverflow;
 uint8_t leftOverflow;

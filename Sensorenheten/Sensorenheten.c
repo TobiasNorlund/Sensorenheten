@@ -17,10 +17,10 @@
 #include "../../TSEA27-include/SPI/mspi.h"
 #include "../../TSEA27-include/SPI/spi_slave.h"
 
-#define F_CPU 20000000UL // 20mhz
+//#define F_CPU 20000000UL // 20mhz
 #include <util/delay.h>
 
-uint8_t test[32];
+int16_t test,test2,test3;
 
 volatile uint8_t timer2_Overflow;
 #define GET_TIMESTAMP (((uint16_t)timer2_Overflow << 8)|(uint16_t)TCNT0)
@@ -40,7 +40,10 @@ int main(void)
 	// end init 8 sek /16 bit timestamp
 	uint16_t autoCalibrateGyroTimestamp=0;
 	sei();//enable interupts
-	_delay_ms(100);//vänta så vi har lite värden för kalibrering av gyro, samt att vi slipper massa nollor.
+	for (uint8_t i = 0; i < 10; i++)
+	{
+		updateGyroData();
+	}
 	// Autokalibrera antar att vi står still när vi startar.
 	calibrateGyro(20);// TODO tune
 
@@ -55,8 +58,7 @@ int main(void)
 		
 	while(1)
 	{
-		//constructSensorMessage(test,&lenR);
-		
+	
 		if(SPI_SLAVE_read(msg, &type, &len))//om det finns ett helt medelande
 		{
 			switch (type)
@@ -92,6 +94,7 @@ int main(void)
 #pragma GCC optimize ("O0")
 void constructSensorMessage(uint8_t *msg, uint8_t *len)
 {
+	
 	//constuct sensor message
 	msg[0] = LONGFRONT;
 	msg[1] = longDistSensor(median(distSensor[0], NUMSAMPLES));
@@ -105,13 +108,15 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 	msg[9] = shortDistSensor(median(distSensor[4], NUMSAMPLES));
 	msg[10] = SHORTFRONTLEFT;
 	msg[11] = shortDistSensor(median(distSensor[5], NUMSAMPLES));
-	msg[12] = SHORTREARRIGHT;
+	msg[12] = SHORTREARRIGHT; 
 	msg[13] = shortDistSensor(median(distSensor[6], NUMSAMPLES));
 	msg[14] = SHORTREARLEFT;
 	msg[15] = shortDistSensor(median(distSensor[7], NUMSAMPLES));
 	msg[16] = IDGYROSENSOR;
-	uint16_t tGyro = filterSampleArrayMeanPlusPlus(gyroData, NUMGYROSAMPLES,5);
-	int16_t gyroMsg = gyroLookUp(tGyro);
+	uint16_t tGyro;
+	tGyro = filterSampleArrayMeanPlusPlus(gyroData, NUMGYROSAMPLES,5);
+	int16_t gyroMsg; 
+	gyroMsg = gyroLookUp(tGyro);
 	msg[17] = (gyroMsg>>8);//GYRO 
 	msg[18] = gyroMsg&0x00FF;//GYRO
 	msg[19] = IDSPEEDRIGHT;
@@ -120,6 +125,7 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 	msg[22] = calcVelocityLeft();//rot vänster cm/sek
 	// sätt längd
 	*len = 23;
+	
 }
 #pragma GCC pop_options
 

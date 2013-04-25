@@ -8,14 +8,14 @@
 
 #define WHEELDIAM 6.3f // cm
 #define PI 3.14f 
-#define NUMBEROFSTRIPES 10
+#define NUMBEROFSTRIPES 16
 /*
 	+1 var 1024 klockcykel
 	8Mhz = 8000000 Hz
 	8000000/1024=7812.5
 	1/7812.5 = 0.000128 s per +1
 */
-#define TICKTIME 0.000128f // TODO on clock update 1024/8000000=0.000128
+#define TICKTIME 0.0000512f // TODO on clock update 1024/8000000=0.000128
 
 void Init_rotsensor(void)
 {
