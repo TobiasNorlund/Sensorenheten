@@ -27,6 +27,11 @@ volatile uint8_t timer2_Overflow;
 
 int main(void)
 {	
+	uint8_t pinChangeCounterLeft = 0;
+	uint8_t pinChangeCounterRight = 0;
+	uint8_t pinChangeLastLeft = 0;
+	uint8_t pinChangeLastRight = 0;
+	
 	Init_rotsensor();
 	Init_distsensor();
 	SPI_SLAVE_init();
@@ -83,7 +88,38 @@ int main(void)
 			calibrateGyro(10);//max 10 i komp per gång vi kalibrerar
 			autoCalibrateGyroTimestamp=GET_TIMESTAMP;
 		}
-
+		if(pinChangeLastRight == 0)
+		{
+			if(PINA & 1<<PINA0)
+			{
+				pinChangeCounterRight++;
+				pinChangeLastRight = 1;
+			}
+		if(pinChangeLastRight == 1)
+		{
+			if(PINA & 0<<PINA0)
+			{
+				pinChangeCounterRight++;
+				pinChangeLastRight = 0;
+			}
+		}
+		}		
+		if(pinChangeLastLeft == 0)
+		{
+			if(PINA & 1<<PINA1)
+			{
+				pinChangeCounterLeft++;
+				pinChangeLastLeft = 1;
+			}
+		}
+		if(pinChangeCounterLeft == 1)
+		{
+			if(PINA & 0<<PINA1)
+			{
+				pinChangeCounterLeft++;
+				pinChangeLastLeft = 0;
+			}
+		}
 	}
 	return 0;
 }

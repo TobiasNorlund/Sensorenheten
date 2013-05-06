@@ -25,6 +25,11 @@ void Init_rotsensor(void)
 	CurrentRightSensor=0;
 	CurrentLeftSensor=0;
 	
+	runningAverageIndex = 0;
+	runningAverageLeftSum = 0;
+	averageLeft = 0;
+	leftBufferFilled = 0;
+	
 	//setup pin change interupts
 	PCICR = (1<<PCIE2)|(1<<PCIE3);//enable pin change interupt 2 och 3
 	PCMSK3 = (1<<PCINT30);// enable on interupt pin 30
@@ -75,6 +80,41 @@ uint8_t calcVelocityLeft(void)
 	}
 }
 
+uint8_t filterSamples(volatile uint16_t  *samples, uint8_t numOfSamples, uint8_t threshold)
+{
+	//räkna ut medelvärde
+	//ta bort för långa värden som uppkommer pga avbrott
+	//sluta läsa av arrayen om roboten står still
+}
+
+uint8_t runningAverageLeft(uint8_t newSample) //tar med värden när den står still, inte bra
+{
+	if(leftBufferFilled == 1)
+	{
+		//Ta bort gammalt värde från summan och lägg till nytt
+		runningAverageLeftSum -= leftSensor[CurrentLeftSensor];
+		leftSensor[CurrentLeftSensor] = newSample;
+		runningAverageLeftSum += leftSensor[CurrentLeftSensor];
+		averageLeft = runningAverageLeftSum/NUMROTSAMPLES;
+		return;		
+	}
+	else if(CurrentLeftSensor == NUMROTSAMPLES)
+	{
+		leftBufferFilled = 1;
+		runningAverageLeftSum -= leftSensor[CurrentLeftSensor];
+		leftSensor[CurrentLeftSensor] = newSample;
+		runningAverageLeftSum += leftSensor[CurrentLeftSensor];
+		averageLeft = runningAverageLeftSum/NUMROTSAMPLES;
+		return;		
+	}
+	else
+	{
+		leftSensor[CurrentLeftSensor] = newSample;
+		runningAverageLeftSum += leftSensor[CurrentLeftSensor];
+		averageLeft = runningAverageLeftSum/(CurrentLeftSensor+1);
+		return;
+	}
+}
 
 ISR(PCINT3_vect)
 {
