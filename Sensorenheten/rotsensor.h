@@ -42,7 +42,7 @@ void Init_rotsensor(void);
 uint8_t calcVelocityRight(void);
 uint8_t calcVelocityLeft(void);
 uint8_t runningAverageLeft(uint8_t newSample);
-uint8_t filterSamples(volatile uint16_t  *samples, uint8_t numOfSamples, uint8_t threshold);
+uint16_t filterRotSamples(volatile uint16_t  *samples, uint8_t numOfSamples, uint8_t threshold, uint8_t start)
 void updatePinToggleCounter(void);
 
 #endif /* ROTSENSOR_H_ */
