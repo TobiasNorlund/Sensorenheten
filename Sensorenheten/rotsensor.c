@@ -8,7 +8,7 @@
 
 #define WHEELDIAM 6.3f // cm
 #define PI 3.14f 
-#define NUMBEROFSTRIPES 16
+#define NUMBEROFSTRIPES 12
 /*
 	+1 var 1024 klockcykel
 	8Mhz = 8000000 Hz
