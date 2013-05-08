@@ -30,18 +30,18 @@ void Init_rotsensor(void)
 	averageLeft = 0;
 	leftBufferFilled = 0;
 	
-	uint8_t pinChangeCounterLeft = 0;
-	uint8_t pinChangeCounterRight = 0;
-	uint8_t pinStateLastLeft = 0;
-	uint8_t pinStateLastRight = 0;
-	uint8_t pinCountLastLeft = 0;
-	uint8_t pinCountLastRight = 0;
-	
+	pinChangeCounterLeft = 0;
+	pinChangeCounterRight = 0;
+	pinStateLastLeft = 0;
+	pinStateLastRight = 0;
+	pinCountLastLeft = 0;
+	pinCountLastRight = 0;
+/*	
 	//setup pin change interupts
 	PCICR = (1<<PCIE2)|(1<<PCIE3);//enable pin change interupt 2 och 3
 	PCMSK3 = (1<<PCINT30);// enable on interupt pin 30
 	PCMSK2 = (1<<PCINT16);// enable on interupt pin 16
-	
+*/
 	//setup timers 1 och 3 16bit timers
 	//start clock and set clock devider.
 	TCCR1B=(1<<CS10)|(0<<CS11)|(1<<CS12);//clk/1024 (From prescaler)
@@ -57,33 +57,43 @@ void Init_rotsensor(void)
 
 uint8_t calcVelocityRight(void)
 {
-	if(rightSensorOverFlow[CurrentRightSensor]>0)//TODO tune
+	if((rightSensor[CurrentRightSensor]>32300)||(rightOverflow>0))//TODO tune
 	{
 		return 0;// om overflow står vi nog stilla
 	}
 	else if(rightSensor[CurrentLeftSensor]==0)
 	{
-		return 255;
+		return 0;
 	}
 	else
 	{
-		return WHEELDIAM*PI/(rightSensor[CurrentRightSensor]*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
+		uint8_t t = 2*WHEELDIAM*PI/(rightSensor[CurrentRightSensor]*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
+		if (t>110)
+		{
+			return t;
+		}
+		return t;
 	}
 }
 
 uint8_t calcVelocityLeft(void)
 {
-	if(leftSensorOverFlow[CurrentLeftSensor]>0)//TODO tune
+	if((leftSensor[CurrentLeftSensor]>32300)||(leftOverflow>0))//TODO tune
 	{
 		return 0;// om overflow står vi nog stilla, >8cm/s == stilla
 	}
 	else if(leftSensor[CurrentLeftSensor]==0)
 	{
-		return 255;
+		return 0;
 	}
 	else
 	{
-		return WHEELDIAM*PI/(leftSensor[CurrentLeftSensor]*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
+		uint8_t t = 2*WHEELDIAM*PI/(leftSensor[CurrentLeftSensor]*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
+		if (t>110)
+		{
+			return t;
+		}
+		return t;
 	}
 }
 
@@ -125,19 +135,9 @@ uint8_t runningAverageLeft(uint8_t newSample) //tar med värden när den står s
 
 void updatePinToggleCounter(void)
 {
-	if(pinChangeCounterLeft == 255) //undviker overflow
-	{
-		pinChangeCounterLeft = pinChangeCounterLeft-pinCountLastLeft;
-		pinCountLastLeft = 0;
-	}
-	if(pinChangeCounterRight == 255) //underviker overflow
-	{
-		pinChangeCounterRight = pinChangeCounterRight-pinCountLastRight;
-		pinCountLastRight = 0;
-	}
 	if(pinStateLastRight == 0)
 	{
-		if(PINA & 1<<PINA0)
+		if(PIND &  (1<<PIND6))
 		{
 			pinChangeCounterRight++;
 			pinStateLastRight = 1;
@@ -145,38 +145,56 @@ void updatePinToggleCounter(void)
 	}	
 	if(pinStateLastRight == 1)
 	{
-		if(PINA & 0<<PINA0)
+		if(!(PIND & (1<<PIND6)))
 		{
 			pinChangeCounterRight++;
 			pinStateLastRight = 0;
+			CurrentRightSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
+			if(NUMROTSAMPLES<=CurrentRightSensor)
+			{
+				CurrentRightSensor=0;
+			}
+			rightSensor[CurrentRightSensor]=TCNT1;
+			TCNT1=0;
+			rightSensorOverFlow[CurrentRightSensor]=rightOverflow;
+			rightOverflow=0;
 		}
 	}
 	if(pinStateLastLeft == 0)
 	{
-		if(PINA & 1<<PINA1)
+		if(PINC & (1<<PINC0))
 		{
 			pinChangeCounterLeft++;
 			pinStateLastLeft = 1;
 		}
 	}
-	if(pinChangeCounterLeft == 1)
+	if(pinStateLastLeft == 1)
 	{
-		if(PINA & 0<<PINA1)
+		if(!(PINC & (1<<PINC0)))
 		{
 			pinChangeCounterLeft++;
 			pinStateLastLeft = 0;
+			CurrentLeftSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
+			if(NUMROTSAMPLES<=CurrentLeftSensor)
+			{
+				CurrentLeftSensor=0;
+			}
+			leftSensor[CurrentLeftSensor]=TCNT3;
+			TCNT3=0;
+			leftSensorOverFlow[CurrentLeftSensor]=leftOverflow;
+			leftOverflow=0;
 		}
 	}
 }
 
-ISR(PCINT3_vect)
+ISR(PCINT3_vect) //pin20
 {
 	CurrentRightSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
 	if(NUMROTSAMPLES<=CurrentRightSensor)
 	{
 		CurrentRightSensor=0;
 	}
-	if(pinChangeCounterRight-pinCountLastRight <= 1)
+	if(pinChangeCounterRight<=1)
 	{
 		rightSensor[CurrentRightSensor]=TCNT1;
 	}
@@ -188,16 +206,17 @@ ISR(PCINT3_vect)
 	rightSensorOverFlow[CurrentRightSensor]=rightOverflow;
 	TCNT1=0;//reset
 	rightOverflow=0;
+	pinChangeCounterRight=0;
 }
 
-ISR(PCINT2_vect)
+ISR(PCINT2_vect) //pin 22
 {
 	CurrentLeftSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
 	if(NUMROTSAMPLES<=CurrentLeftSensor)
 	{
 		CurrentLeftSensor=0;
 	}
-	if(pinChangeCounterLeft-pinCountLastLeft <= 1)
+	if(pinChangeCounterLeft<= 1)
 	{
 		leftSensor[CurrentLeftSensor]=TCNT3;		
 	}
@@ -209,6 +228,7 @@ ISR(PCINT2_vect)
 	leftSensorOverFlow[CurrentLeftSensor]=leftOverflow;
 	TCNT3=0;//reset
 	leftOverflow=0;
+	pinChangeCounterLeft=0;
 }
 
 ISR(TIMER1_OVF_vect) {

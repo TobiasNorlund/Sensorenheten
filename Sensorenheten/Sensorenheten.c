@@ -27,11 +27,7 @@ volatile uint8_t timer2_Overflow;
 
 int main(void)
 {	
-	uint8_t pinChangeCounterLeft = 0;
-	uint8_t pinChangeCounterRight = 0;
-	uint8_t pinStateLastLeft = 0;
-	uint8_t pinStateLastRight = 0;
-	
+
 	Init_rotsensor();
 	Init_distsensor();
 	SPI_SLAVE_init();

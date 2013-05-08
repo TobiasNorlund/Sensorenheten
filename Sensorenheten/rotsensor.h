@@ -30,12 +30,12 @@ uint8_t runningAverageLeftSum;
 uint8_t averageLeft;
 uint8_t leftBufferFilled;
 
-uint8_t pinChangeCounterLeft;
-uint8_t pinChangeCounterRight;
-uint8_t pinStateLastLeft;
-uint8_t pinStateLastRight;
-uint8_t pinCountLastLeft;
-uint8_t pinCountLastRight;
+volatile uint8_t pinChangeCounterLeft;
+volatile uint8_t pinChangeCounterRight;
+volatile uint8_t pinStateLastLeft;
+volatile uint8_t pinStateLastRight;
+volatile uint8_t pinCountLastLeft;
+volatile uint8_t pinCountLastRight;
 
 
 void Init_rotsensor(void);
