@@ -25,23 +25,11 @@ void Init_rotsensor(void)
 	CurrentRightSensor=0;
 	CurrentLeftSensor=0;
 	
-	runningAverageIndex = 0;
-	runningAverageLeftSum = 0;
-	averageLeft = 0;
-	leftBufferFilled = 0;
-	
 	pinChangeCounterLeft = 0;
 	pinChangeCounterRight = 0;
 	pinStateLastLeft = 0;
 	pinStateLastRight = 0;
-	pinCountLastLeft = 0;
-	pinCountLastRight = 0;
-/*	
-	//setup pin change interupts
-	PCICR = (1<<PCIE2)|(1<<PCIE3);//enable pin change interupt 2 och 3
-	PCMSK3 = (1<<PCINT30);// enable on interupt pin 30
-	PCMSK2 = (1<<PCINT16);// enable on interupt pin 16
-*/
+
 	//setup timers 1 och 3 16bit timers
 	//start clock and set clock devider.
 	TCCR1B=(1<<CS10)|(0<<CS11)|(1<<CS12);//clk/1024 (From prescaler)
@@ -68,7 +56,7 @@ uint8_t calcVelocityRight(void)
 	}
 	else
 	{
-		uint16_t meanVal = filterRotSamples(rightSensor, NUMROTSAMPLES, 40, CurrentRightSensor);//TODO kolla threshold så det fungerar
+		uint16_t meanVal = filterMeanTimeAware(rightSensor, NUMROTSAMPLES, 40, CurrentRightSensor);//TODO kolla threshold så det fungerar
 		uint8_t t = 2*WHEELDIAM*PI/(meanVal*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
 		return t;
 	}
@@ -87,88 +75,19 @@ uint8_t calcVelocityLeft(void)
 	}
 	else
 	{
-		uint16_t meanVal = filterRotSamples(leftSensor, NUMROTSAMPLES, 40, CurrentLeftSensor);//TODO kolla threshold så det fungerar
+		uint16_t meanVal = filterMeanTimeAware(leftSensor, NUMROTSAMPLES, 40, CurrentLeftSensor);//TODO kolla threshold så det fungerar
 		uint8_t t = 2*WHEELDIAM*PI/(meanVal*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
 		return t;
 	}
 }
-//turn off optimization 
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
-uint16_t filterRotSamples(volatile uint16_t  *samples, uint8_t numOfSamples, uint8_t threshold, uint8_t start)
-{
-	//räkna ut medelvärde
-	//ta bort för långa värden som uppkommer pga avbrott
-	//sluta läsa av arrayen om roboten står still
-	uint8_t currentNumInRow=0;
-	uint16_t currentSum=0;
-	uint8_t i = 0;
-	uint8_t n = start;
-	while(i < numOfSamples-1)
-	{
-		if(absThreshold(samples[n], samples[n-1]) < threshold)
-		{
-			currentNumInRow++;
-			currentSum+=samples[n];//summera
-		}
-		n--;
-		i++;
-		if(n<0)
-		{
-			n=numOfSamples-1;
-		}
-	}
-	if(absThreshold(samples[start], samples[start+1]) < threshold)
-	{
-		currentNumInRow++;
-		currentSum+=samples[start+1];//summera
-	}
-	if(currentNumInRow!=0)
-	{
-		uint16_t ttt = (uint16_t)(currentSum/currentNumInRow);//return result
-		return ttt;//return result
-	}
-	else
-	{
-		return samples[start];//om vi har en -x^2 dvs derivatan runt den ser ish ut som en triangel.
-	}
-}
-#pragma GCC pop_options
-//end turn off optimization 
-uint8_t runningAverageLeft(uint8_t newSample) //tar med värden när den står still, inte bra
-{
-	if(leftBufferFilled == 1)
-	{
-		//Ta bort gammalt värde från summan och lägg till nytt
-		runningAverageLeftSum -= leftSensor[CurrentLeftSensor];
-		leftSensor[CurrentLeftSensor] = newSample;
-		runningAverageLeftSum += leftSensor[CurrentLeftSensor];
-		averageLeft = runningAverageLeftSum/NUMROTSAMPLES;
-		return;		
-	}
-	else if(CurrentLeftSensor == NUMROTSAMPLES)
-	{
-		leftBufferFilled = 1;
-		runningAverageLeftSum -= leftSensor[CurrentLeftSensor];
-		leftSensor[CurrentLeftSensor] = newSample;
-		runningAverageLeftSum += leftSensor[CurrentLeftSensor];
-		averageLeft = runningAverageLeftSum/NUMROTSAMPLES;
-		return;		
-	}
-	else
-	{
-		leftSensor[CurrentLeftSensor] = newSample;
-		runningAverageLeftSum += leftSensor[CurrentLeftSensor];
-		averageLeft = runningAverageLeftSum/(CurrentLeftSensor+1);
-		return;
-	}
-}
-
+#define RIGHTSENSORPINHIGH (PIND&(1<<PIND6)
+#define LEFTSENSORPINHIGH (PINC&(1<<PINC0))
 void updatePinToggleCounter(void)
 {
+	//right toggle checking code
 	if(pinStateLastRight == 0)
 	{
-		if(PIND &  (1<<PIND6))
+		if(RIGHTSENSORPINHIGH)
 		{
 			pinChangeCounterRight++;
 			pinStateLastRight = 1;
@@ -176,7 +95,7 @@ void updatePinToggleCounter(void)
 	}	
 	if(pinStateLastRight == 1)
 	{
-		if(!(PIND & (1<<PIND6)))
+		if(!RIGHTSENSORPINHIGH)
 		{
 			pinChangeCounterRight++;
 			pinStateLastRight = 0;
@@ -191,9 +110,10 @@ void updatePinToggleCounter(void)
 			rightOverflow=0;
 		}
 	}
+	//left toggle checking code
 	if(pinStateLastLeft == 0)
 	{
-		if(PINC & (1<<PINC0))
+		if(LEFTSENSORPINHIGH)
 		{
 			pinChangeCounterLeft++;
 			pinStateLastLeft = 1;
@@ -201,7 +121,7 @@ void updatePinToggleCounter(void)
 	}
 	if(pinStateLastLeft == 1)
 	{
-		if(!(PINC & (1<<PINC0)))
+		if(!LEFTSENSORPINHIGH)
 		{
 			pinChangeCounterLeft++;
 			pinStateLastLeft = 0;
@@ -216,50 +136,6 @@ void updatePinToggleCounter(void)
 			leftOverflow=0;
 		}
 	}
-}
-
-ISR(PCINT3_vect) //pin20
-{
-	CurrentRightSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
-	if(NUMROTSAMPLES<=CurrentRightSensor)
-	{
-		CurrentRightSensor=0;
-	}
-	if(pinChangeCounterRight<=1)
-	{
-		rightSensor[CurrentRightSensor]=TCNT1;
-	}
-	else
-	{
-		rightSensor[CurrentRightSensor]=TCNT1/3;
-	}
-	pinCountLastRight = pinChangeCounterRight;
-	rightSensorOverFlow[CurrentRightSensor]=rightOverflow;
-	TCNT1=0;//reset
-	rightOverflow=0;
-	pinChangeCounterRight=0;
-}
-
-ISR(PCINT2_vect) //pin 22
-{
-	CurrentLeftSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
-	if(NUMROTSAMPLES<=CurrentLeftSensor)
-	{
-		CurrentLeftSensor=0;
-	}
-	if(pinChangeCounterLeft<= 1)
-	{
-		leftSensor[CurrentLeftSensor]=TCNT3;		
-	}
-	else
-	{
-		leftSensor[CurrentLeftSensor]=TCNT3/3;
-	}
-	pinCountLastLeft = pinChangeCounterLeft;
-	leftSensorOverFlow[CurrentLeftSensor]=leftOverflow;
-	TCNT3=0;//reset
-	leftOverflow=0;
-	pinChangeCounterLeft=0;
 }
 
 ISR(TIMER1_OVF_vect)

@@ -17,12 +17,9 @@
 #include "../../TSEA27-include/SPI/mspi.h"
 #include "../../TSEA27-include/SPI/spi_slave.h"
 
-//#define F_CPU 20000000UL // 20mhz
 #include <util/delay.h>
 
-int16_t test,test2,test3;
-
-volatile uint8_t timer2_Overflow;
+volatile uint8_t timer2_Overflow;//auto tune gyro
 #define GET_TIMESTAMP (((uint16_t)timer2_Overflow << 8)|(uint16_t)TCNT0)
 
 int main(void)
@@ -41,7 +38,7 @@ int main(void)
 	// end init 8 sek /16 bit timestamp
 	uint16_t autoCalibrateGyroTimestamp=0;
 	sei();//enable interupts
-	for (uint8_t i = 0; i < 10; i++)
+	for (uint8_t i = 0; i < 10; i++)//sample gyro to calibrate
 	{
 		updateGyroData();
 	}
@@ -89,7 +86,6 @@ int main(void)
 	return 0;
 }
 
-
 //turn off optimization
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
@@ -130,6 +126,7 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 }
 #pragma GCC pop_options
 
-ISR(TIMER2_OVF_vect) {
+ISR(TIMER2_OVF_vect)
+{
 	timer2_Overflow++;
 }
