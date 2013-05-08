@@ -125,14 +125,14 @@ uint8_t runningAverageLeft(uint8_t newSample) //tar med värden när den står s
 
 void updatePinToggleCounter(void)
 {
-	if(pinChangeCounterLeft == 255)
+	if(pinChangeCounterLeft == 255) //undviker overflow
 	{
-		pinChangeCounterLeft = 0;
+		pinChangeCounterLeft = pinChangeCounterLeft-pinCountLastLeft;
 		pinCountLastLeft = 0;
 	}
-	if(pinChangeCounterRight == 255)
+	if(pinChangeCounterRight == 255) //underviker overflow
 	{
-		pinChangeCounterRight = 0;
+		pinChangeCounterRight = pinChangeCounterRight-pinCountLastRight;
 		pinCountLastRight = 0;
 	}
 	if(pinStateLastRight == 0)
