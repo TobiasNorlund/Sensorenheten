@@ -30,6 +30,13 @@ void Init_rotsensor(void)
 	averageLeft = 0;
 	leftBufferFilled = 0;
 	
+	uint8_t pinChangeCounterLeft = 0;
+	uint8_t pinChangeCounterRight = 0;
+	uint8_t pinStateLastLeft = 0;
+	uint8_t pinStateLastRight = 0;
+	uint8_t pinCountLastLeft = 0;
+	uint8_t pinCountLastRight = 0;
+	
 	//setup pin change interupts
 	PCICR = (1<<PCIE2)|(1<<PCIE3);//enable pin change interupt 2 och 3
 	PCMSK3 = (1<<PCINT30);// enable on interupt pin 30
@@ -68,7 +75,7 @@ uint8_t calcVelocityLeft(void)
 {
 	if(leftSensorOverFlow[CurrentLeftSensor]>0)//TODO tune
 	{
-		return 0;// om overflow står vi nog stilla
+		return 0;// om overflow står vi nog stilla, >8cm/s == stilla
 	}
 	else if(leftSensor[CurrentLeftSensor]==0)
 	{
@@ -116,6 +123,52 @@ uint8_t runningAverageLeft(uint8_t newSample) //tar med värden när den står s
 	}
 }
 
+void updatePinToggleCounter(void)
+{
+	if(pinChangeCounterLeft == 255)
+	{
+		pinChangeCounterLeft = 0;
+		pinCountLastLeft = 0;
+	}
+	if(pinChangeCounterRight == 255)
+	{
+		pinChangeCounterRight = 0;
+		pinCountLastRight = 0;
+	}
+	if(pinStateLastRight == 0)
+	{
+		if(PINA & 1<<PINA0)
+		{
+			pinChangeCounterRight++;
+			pinStateLastRight = 1;
+		}
+	}	
+	if(pinStateLastRight == 1)
+	{
+		if(PINA & 0<<PINA0)
+		{
+			pinChangeCounterRight++;
+			pinStateLastRight = 0;
+		}
+	}
+	if(pinStateLastLeft == 0)
+	{
+		if(PINA & 1<<PINA1)
+		{
+			pinChangeCounterLeft++;
+			pinStateLastLeft = 1;
+		}
+	}
+	if(pinChangeCounterLeft == 1)
+	{
+		if(PINA & 0<<PINA1)
+		{
+			pinChangeCounterLeft++;
+			pinStateLastLeft = 0;
+		}
+	}
+}
+
 ISR(PCINT3_vect)
 {
 	CurrentRightSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
@@ -123,7 +176,15 @@ ISR(PCINT3_vect)
 	{
 		CurrentRightSensor=0;
 	}
-	rightSensor[CurrentRightSensor]=TCNT1;
+	if(pinChangeCounterRight-pinCountLastRight <= 1)
+	{
+		rightSensor[CurrentRightSensor]=TCNT1;
+	}
+	else
+	{
+		rightSensor[CurrentRightSensor]=TCNT1/3;
+	}
+	pinCountLastRight = pinChangeCounterRight;
 	rightSensorOverFlow[CurrentRightSensor]=rightOverflow;
 	TCNT1=0;//reset
 	rightOverflow=0;
@@ -136,7 +197,15 @@ ISR(PCINT2_vect)
 	{
 		CurrentLeftSensor=0;
 	}
-	leftSensor[CurrentLeftSensor]=TCNT3;
+	if(pinChangeCounterLeft-pinCountLastLeft <= 1)
+	{
+		leftSensor[CurrentLeftSensor]=TCNT3;		
+	}
+	else
+	{
+		leftSensor[CurrentLeftSensor]=TCNT3/3;
+	}
+	pinCountLastLeft = pinChangeCounterLeft;
 	leftSensorOverFlow[CurrentLeftSensor]=leftOverflow;
 	TCNT3=0;//reset
 	leftOverflow=0;
