@@ -29,6 +29,16 @@ void Init_rotsensor(void)
 	pinChangeCounterRight = 0;
 	pinStateLastLeft = 0;
 	pinStateLastRight = 0;
+	for(uint8_t i = 0; i < NUMROTSAMPLES; i++)
+	{
+		rightSensor[i]=0;
+		leftSensor[i]=0;
+
+		rightSensorOverFlow[i]=0;
+		leftSensorOverFlow[i]=0;
+	}
+
+
 
 	//setup timers 1 och 3 16bit timers
 	//start clock and set clock devider.
@@ -80,7 +90,7 @@ uint8_t calcVelocityLeft(void)
 		return t;
 	}
 }
-#define RIGHTSENSORPINHIGH (PIND&(1<<PIND6)
+#define RIGHTSENSORPINHIGH (PIND&(1<<PIND6))
 #define LEFTSENSORPINHIGH (PINC&(1<<PINC0))
 void updatePinToggleCounter(void)
 {
