@@ -60,7 +60,7 @@ uint8_t calcVelocityRight(void)
 	{
 		return 0;// om overflow står vi nog stilla
 	}
-	else if(rightSensor[CurrentLeftSensor]==0)
+	else if(rightSensor[CurrentRightSensor]==0)
 	{
 		return 0;
 	}
