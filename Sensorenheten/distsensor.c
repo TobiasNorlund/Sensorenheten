@@ -10,6 +10,7 @@
 #define MINIMUMVALUELONG 82
 #define MAXIMUMVALUESHORT 492
 #define MINIMUMVALUESHORT 80
+#define LONGTABLEOFFSET 6
 
 volatile uint8_t currentDistSensor=0;
 volatile uint8_t currentSample=0;
@@ -87,19 +88,19 @@ uint16_t absDist(uint16_t a1, uint16_t a2)
 uint8_t longDistSensor(uint16_t sample)
 {
 	// ska hantera om sample är utanför look up tables intervall
-	if(MAXIMUMVALUELONG<sample)
+	if(MAXIMUMVALUELONG<(sample+LONGTABLEOFFSET))
 	{
 		//look up MAXIMUMVALUELONG in look up table
 		return 0;
 	}
-	else if(sample<MINIMUMVALUELONG)
+	else if((sample+LONGTABLEOFFSET)<MINIMUMVALUELONG)
 	{
 		//look up MINIMUMVALUELONG in look up table
 		return 255;
 	}
 	else
 	{
-		return  pgm_read_byte(&(lookUpLongSensor[sample-MINIMUMVALUELONG]));
+		return  pgm_read_byte(&(lookUpLongSensor[(sample+LONGTABLEOFFSET)-MINIMUMVALUELONG]));
 	}
 }
 
