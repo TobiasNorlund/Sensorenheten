@@ -16,11 +16,19 @@
 
 volatile uint16_t distSensor[8][NUMSAMPLES];
 
+/*
+* Initerar AD-omvandlingen.
+*/
 void Init_distsensor(void);
-void changeDistSensor(uint8_t ch);
-uint16_t filterSampleArray(volatile uint16_t *samples, uint8_t numOfSamples);
+
+/*
+* Slå upp ADC -> cm. 0 om för nära 255 om för långt bort.
+*/
 uint8_t longDistSensor(uint16_t sample);
+
+/*
+* Slå upp ADC -> cm/2. 0 om för nära 255 om för långt bort.
+*/
 uint8_t shortDistSensor(uint16_t sample);
-uint16_t absDist(uint16_t a1, uint16_t a2);
 
 #endif /* DISTSENSOR_H_ */

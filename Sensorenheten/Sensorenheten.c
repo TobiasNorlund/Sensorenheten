@@ -71,7 +71,7 @@ int main(void)
 					break;
 			}			
 		}
-		updateGyroData();
+		updateGyroData();//samplar gyrot
 		// auto calibrate Gyro
 		// Om Höger och vänster hjul snurrar lika fort
 		// 0.000128 * 5 = 0.00064 sek
@@ -81,7 +81,7 @@ int main(void)
 			calibrateGyro(10);//max 10 i komp per gång vi kalibrerar
 			autoCalibrateGyroTimestamp=GET_TIMESTAMP;
 		}
-		updatePinToggleCounter();
+		updatePinToggleCounter();//Kollar om något av hjulens sensorer har togglat. Uppdaterar tiden om så skett.
 	}
 	return 0;
 }

@@ -30,9 +30,24 @@ uint8_t pinChangeCounterRight;
 uint8_t pinStateLastLeft;
 uint8_t pinStateLastRight;
 
+/*
+* Initiera minnet samt timers för de olika hjulen.
+*/
 void Init_rotsensor(void);
+
+/*
+* Beräkna hastigheten ut i från pulstid.
+*/
 uint8_t calcVelocityRight(void);
+
+/*
+* Beräkna hastigheten ut i från pulstid.
+*/
 uint8_t calcVelocityLeft(void);
+
+/*
+* Kollar om någon av sensorerna har bytt state.
+*/
 void updatePinToggleCounter(void);
 
 #endif /* ROTSENSOR_H_ */
