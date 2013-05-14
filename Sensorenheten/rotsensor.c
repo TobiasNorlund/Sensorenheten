@@ -75,7 +75,7 @@ uint8_t calcVelocityRight(void)
 uint8_t calcVelocityLeft(void)
 {
 	volatile uint16_t currentTime = TCNT1;
-	if((currentTime>32300)||(leftOverflow>0))//TODO tune
+	if((currentTime>16000)||(leftOverflow>0))//TODO tune
 	{
 		return 0;// om overflow står vi nog stilla, >8cm/s == stilla
 	}
