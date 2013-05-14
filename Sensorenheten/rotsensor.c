@@ -56,7 +56,7 @@ void Init_rotsensor(void)
 uint8_t calcVelocityRight(void)
 {
 	volatile uint16_t currentTime = TCNT1;
-	if((currentTime>32300)||(rightOverflow>0))//TODO tune
+	if((currentTime>16000)||(rightOverflow>0))//TODO tune
 	{
 		return 0;// om overflow står vi nog stilla
 	}
