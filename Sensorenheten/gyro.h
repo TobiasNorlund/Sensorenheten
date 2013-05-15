@@ -1,9 +1,18 @@
-﻿/*
- * gyro.h
- *
- * Created: 4/16/2013 9:48:28 AM
- *  Author: johka546
- */ 
+/**
+* TSEA27 Elektronikprojekt
+*
+* IDENTIFIERING
+*
+* Modul:Sensorenheten
+* Filnamn: gyro.h
+* Skriven av: Johan Källström
+* Datum: 2013-05-15
+* Version: 1.0
+*
+* BESKRIVNING
+*
+* Används för att sampla gyrot samt slå upp ADC värden i tabeller.
+*/	
 
 
 #ifndef GYRO_H_

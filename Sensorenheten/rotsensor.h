@@ -1,10 +1,18 @@
-﻿/*
- * rotsensor.h
- *
- * Created: 4/13/2013 7:12:49 PM
- *  Author: johka546
- */ 
-
+/**
+* TSEA27 Elektronikprojekt
+*
+* IDENTIFIERING
+*
+* Modul:Sensorenheten
+* Filnamn: rotsensor.h
+* Skriven av: Johan Källström
+* Datum: 2013-05-15
+* Version: 1.0
+*
+* BESKRIVNING
+*
+* Används för att att mäta pulstiderna på hjulsidorna och med hjälp utav det räkna ut hastigheten för respektive hjul.
+*/	
 
 #ifndef ROTSENSOR_H_
 #define ROTSENSOR_H_

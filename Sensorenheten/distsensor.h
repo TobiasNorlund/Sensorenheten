@@ -1,9 +1,18 @@
-﻿/*
- * distsensor.h
- *
- * Created: 4/13/2013 7:12:49 PM
- *  Author: johka546
- */ 
+/**
+* TSEA27 Elektronikprojekt
+*
+* IDENTIFIERING
+*
+* Modul:Sensorenheten
+* Filnamn: distsensor.h
+* Skriven av: Johan Källström
+* Datum: 2013-05-15
+* Version: 1.0
+*
+* BESKRIVNING
+*
+* Används för att att mäta avståndsensorerna samt slå upp ADC värden i tabeller.
+*/	
 
 
 #ifndef DISTSENSOR_H_

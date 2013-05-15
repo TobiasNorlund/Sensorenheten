@@ -1,9 +1,18 @@
-﻿/*
- * rotsensor.c
- *
- * Created: 4/13/2013 7:12:09 PM
- *  Author: johka546
- */ 
+/**
+* TSEA27 Elektronikprojekt
+*
+* IDENTIFIERING
+*
+* Modul:Sensorenheten
+* Filnamn: rotsensor.c
+* Skriven av: Johan Källström
+* Datum: 2013-05-15
+* Version: 1.0
+*
+* BESKRIVNING
+*
+* Används för att att mäta pulstiderna på hjulsidorna och med hjälp utav det räkna ut hastigheten för respektive hjul.
+*/	
 #include "rotsensor.h"
 #include "../../TSEA27-include/utils.h"
 #define WHEELDIAM 6.3f // cm

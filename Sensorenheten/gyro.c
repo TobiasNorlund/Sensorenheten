@@ -1,9 +1,18 @@
-﻿/*
- * gyro.c
- *
- * Created: 4/16/2013 9:48:15 AM
- *  Author: johka546
- */
+/**
+* TSEA27 Elektronikprojekt
+*
+* IDENTIFIERING
+*
+* Modul:Sensorenheten
+* Filnamn: gyro.c
+* Skriven av: Johan Källström
+* Datum: 2013-05-15
+* Version: 1.0
+*
+* BESKRIVNING
+*
+* Används för att sampla gyrot samt slå upp ADC värden i tabeller.
+*/	
 #define MAXIMUMVALUEGYRO 923	
 #define MINIMUMVALUEGYRO 101
 #define CENTERVALUE 	 409 //409 är 0 i lookuptable

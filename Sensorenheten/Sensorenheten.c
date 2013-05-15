@@ -1,9 +1,18 @@
-﻿/*
- * Sensorenheten.c
- *
- * Created: 4/10/2013 1:47:53 PM
- *  Author: tobno568
- */ 
+/**
+* TSEA27 Elektronikprojekt
+*
+* IDENTIFIERING
+*
+* Modul:Sensorenheten
+* Filnamn: Sensorenheten.c
+* Skriven av: Johan Källström
+* Datum: 2013-05-15
+* Version: 1.0
+*
+* BESKRIVNING
+*
+* Mainfilen för Sensorenheten
+*/	
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
