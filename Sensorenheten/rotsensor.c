@@ -56,7 +56,7 @@ void Init_rotsensor(void)
 uint8_t calcVelocityRight(void)
 {
 	volatile uint16_t currentTime = TCNT1;
-	if((currentTime>16000)||(rightOverflow>0))//TODO tune
+	if((currentTime>8000)||(rightOverflow>0))//TODO tune
 	{
 		return 0;// om overflow står vi nog stilla
 	}
@@ -67,7 +67,7 @@ uint8_t calcVelocityRight(void)
 	else
 	{
 		uint16_t meanVal = filterMeanTimeAware(rightSensor, NUMROTSAMPLES, 40, CurrentRightSensor);//TODO kolla threshold så det fungerar
-		uint8_t t = 2*WHEELDIAM*PI/(meanVal*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
+		uint8_t t = WHEELDIAM*PI/(meanVal*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
 		return t;
 	}
 }
@@ -75,7 +75,7 @@ uint8_t calcVelocityRight(void)
 uint8_t calcVelocityLeft(void)
 {
 	volatile uint16_t currentTime = TCNT1;
-	if((currentTime>16000)||(leftOverflow>0))//TODO tune
+	if((currentTime>8000)||(leftOverflow>0))//TODO tune
 	{
 		return 0;// om overflow står vi nog stilla, >8cm/s == stilla
 	}
@@ -86,7 +86,7 @@ uint8_t calcVelocityLeft(void)
 	else
 	{
 		uint16_t meanVal = filterMeanTimeAware(leftSensor, NUMROTSAMPLES, 40, CurrentLeftSensor);//TODO kolla threshold så det fungerar
-		uint8_t t = 2*WHEELDIAM*PI/(meanVal*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
+		uint8_t t = WHEELDIAM*PI/(meanVal*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
 		return t;
 	}
 }
@@ -101,6 +101,15 @@ void updatePinToggleCounter(void)
 		{
 			pinChangeCounterRight++;
 			pinStateLastRight = 1;
+			CurrentRightSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
+			if(NUMROTSAMPLES<=CurrentRightSensor)
+			{
+				CurrentRightSensor=0;
+			}
+			rightSensor[CurrentRightSensor]=TCNT1;
+			TCNT1=0;
+			rightSensorOverFlow[CurrentRightSensor]=rightOverflow;
+			rightOverflow=0;
 		}
 	}	
 	if(pinStateLastRight == 1)
@@ -127,6 +136,15 @@ void updatePinToggleCounter(void)
 		{
 			pinChangeCounterLeft++;
 			pinStateLastLeft = 1;
+			CurrentLeftSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
+			if(NUMROTSAMPLES<=CurrentLeftSensor)
+			{
+				CurrentLeftSensor=0;
+			}
+			leftSensor[CurrentLeftSensor]=TCNT3;
+			TCNT3=0;
+			leftSensorOverFlow[CurrentLeftSensor]=leftOverflow;
+			leftOverflow=0;
 		}
 	}
 	if(pinStateLastLeft == 1)
