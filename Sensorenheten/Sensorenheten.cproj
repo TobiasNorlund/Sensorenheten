@@ -166,9 +166,6 @@
     <Compile Include="distsensor.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="globals.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="gyro.c">
       <SubType>compile</SubType>
     </Compile>
