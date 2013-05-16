@@ -75,8 +75,8 @@ uint8_t calcVelocityRight(void)
 	}
 	else
 	{
-		uint16_t meanVal = filterMeanTimeAware(rightSensor, NUMROTSAMPLES, 40, CurrentRightSensor);//TODO kolla threshold så det fungerar
-		uint8_t t = WHEELDIAM*PI/(meanVal*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
+		uint16_t meanVal = filterMeanTimeAware(rightSensor, NUMROTSAMPLES, 3, CurrentRightSensor);//TODO kolla threshold så det fungerar
+		uint8_t t = 2*WHEELDIAM*PI/(meanVal*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
 		return t;
 	}
 }
@@ -94,8 +94,8 @@ uint8_t calcVelocityLeft(void)
 	}
 	else
 	{
-		uint16_t meanVal = filterMeanTimeAware(leftSensor, NUMROTSAMPLES, 40, CurrentLeftSensor);//TODO kolla threshold så det fungerar
-		uint8_t t = WHEELDIAM*PI/(meanVal*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
+		uint16_t meanVal = filterMeanTimeAware(leftSensor, NUMROTSAMPLES, 3, CurrentLeftSensor);//TODO kolla threshold så det fungerar
+		uint8_t t = 2*WHEELDIAM*PI/(meanVal*NUMBEROFSTRIPES*TICKTIME);//TODO kolla så den inte avrunda decimaltalen
 		return t;
 	}
 }
@@ -127,7 +127,7 @@ void updatePinToggleCounter(void)
 		{
 			pinChangeCounterRight++;
 			pinStateLastRight = 0;
-			CurrentRightSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
+/*			CurrentRightSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
 			if(NUMROTSAMPLES<=CurrentRightSensor)
 			{
 				CurrentRightSensor=0;
@@ -135,7 +135,7 @@ void updatePinToggleCounter(void)
 			rightSensor[CurrentRightSensor]=TCNT1;
 			TCNT1=0;
 			rightSensorOverFlow[CurrentRightSensor]=rightOverflow;
-			rightOverflow=0;
+			rightOverflow=0;*/
 		}
 	}
 	//left toggle checking code
@@ -162,7 +162,7 @@ void updatePinToggleCounter(void)
 		{
 			pinChangeCounterLeft++;
 			pinStateLastLeft = 0;
-			CurrentLeftSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
+/*			CurrentLeftSensor++;//uppdatera precis innan så den alltid pekar på senaste värdet
 			if(NUMROTSAMPLES<=CurrentLeftSensor)
 			{
 				CurrentLeftSensor=0;
@@ -170,7 +170,7 @@ void updatePinToggleCounter(void)
 			leftSensor[CurrentLeftSensor]=TCNT3;
 			TCNT3=0;
 			leftSensorOverFlow[CurrentLeftSensor]=leftOverflow;
-			leftOverflow=0;
+			leftOverflow=0;*/
 		}
 	}
 }
