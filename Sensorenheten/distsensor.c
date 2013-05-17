@@ -60,22 +60,22 @@ uint8_t longDistSensor(uint16_t sample)
 	}
 }
 
-uint8_t shortDistSensor(uint16_t sample)
+uint8_t shortDistSensor(uint16_t sample, uint8_t tableOffSet)
 {
 	// ska hantera om sample är utanför look up tables intervall
-	if(MAXIMUMVALUESHORT<sample)
+	if(MAXIMUMVALUESHORT<(sample+tableOffSet))
 	{
 		//look up MAXIMUMVALUESHORT in look up table
 		return 0;
 	}
-	else if(sample<MINIMUMVALUESHORT)
+	else if((sample+tableOffSet)<MINIMUMVALUESHORT)
 	{
 		//look up MINIMUMVALUESHORT in look up table
 		return 255;
 	}
 	else
 	{
-		return  pgm_read_byte(&(lookUpShortSensor[sample-MINIMUMVALUESHORT]));
+		return  pgm_read_byte(&(lookUpShortSensor[(sample+tableOffSet)-MINIMUMVALUESHORT]));
 	}
 }
 #pragma GCC pop_options
@@ -93,19 +93,7 @@ ISR(ADC_vect)
 		nextDistSensor = currentDistSensor+1;//next sensor
 		ADMUX=(0b11111000&ADMUX)|(0b00000111&nextDistSensor);//update ad mux
 	}
-	//TESTESTESTESTESTESTESTESTESTESTESTETESTESTESTESTESTESTEST individuell förskjutning
-	if(currentDistSensor == 5)
-	{
-		distSensor[currentDistSensor][currentSample]=ADC-5;		
-	}
-	else if(currentDistSensor == 7)
-	{
-		distSensor[currentDistSensor][currentSample]=ADC-10;		
-	}
-	else
-	{
-		distSensor[currentDistSensor][currentSample]=ADC;
-	}
+	distSensor[currentDistSensor][currentSample]=ADC;
 
 	if(7<nextDistSensor)
 	{

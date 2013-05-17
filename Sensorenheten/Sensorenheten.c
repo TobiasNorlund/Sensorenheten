@@ -111,13 +111,13 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 	msg[6] = LONGLEFT;
 	msg[7] = longDistSensor(median(distSensor[3], NUMSAMPLES));
 	msg[8] = SHORTFRONTRIGHT;
-	msg[9] = shortDistSensor(median(distSensor[4], NUMSAMPLES));
+	msg[9] = shortDistSensor(median(distSensor[4], NUMSAMPLES),3);
 	msg[10] = SHORTFRONTLEFT;
-	msg[11] = shortDistSensor(median(distSensor[5], NUMSAMPLES));
+	msg[11] = shortDistSensor(median(distSensor[5], NUMSAMPLES),0);
 	msg[12] = SHORTREARRIGHT; 
-	msg[13] = shortDistSensor(median(distSensor[6], NUMSAMPLES));
+	msg[13] = shortDistSensor(median(distSensor[6], NUMSAMPLES),5);
 	msg[14] = SHORTREARLEFT;
-	msg[15] = shortDistSensor(median(distSensor[7], NUMSAMPLES));
+	msg[15] = shortDistSensor(median(distSensor[7], NUMSAMPLES),0);
 	msg[16] = IDGYROSENSOR;
 	uint16_t tGyro;
 	tGyro = filterSampleArrayMeanPlusPlus(gyroData, NUMGYROSAMPLES,5);

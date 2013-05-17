@@ -38,6 +38,6 @@ uint8_t longDistSensor(uint16_t sample);
 /*
 * Slå upp ADC -> cm/2. 0 om för nära 255 om för långt bort.
 */
-uint8_t shortDistSensor(uint16_t sample);
+uint8_t shortDistSensor(uint16_t sample, uint8_t tableOffSet);
 
 #endif /* DISTSENSOR_H_ */
