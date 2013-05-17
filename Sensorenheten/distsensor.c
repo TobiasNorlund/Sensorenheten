@@ -93,7 +93,19 @@ ISR(ADC_vect)
 		nextDistSensor = currentDistSensor+1;//next sensor
 		ADMUX=(0b11111000&ADMUX)|(0b00000111&nextDistSensor);//update ad mux
 	}
-	distSensor[currentDistSensor][currentSample]=ADC;
+	//TESTESTESTESTESTESTESTESTESTESTESTETESTESTESTESTESTESTEST individuell förskjutning
+	if(currentDistSensor == 5)
+	{
+		distSensor[currentDistSensor][currentSample]=ADC-5;		
+	}
+	else if(currentDistSensor == 7)
+	{
+		distSensor[currentDistSensor][currentSample]=ADC-10;		
+	}
+	else
+	{
+		distSensor[currentDistSensor][currentSample]=ADC;
+	}
 
 	if(7<nextDistSensor)
 	{
