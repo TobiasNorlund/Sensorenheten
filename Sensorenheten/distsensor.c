@@ -20,6 +20,7 @@
 #define MAXIMUMVALUESHORT 492
 #define MINIMUMVALUESHORT 80
 #define LONGTABLEOFFSET 6
+#define SHORTTABLEOFFSET 1
 
 volatile uint8_t currentDistSensor=0;
 volatile uint8_t currentSample=0;
@@ -63,19 +64,19 @@ uint8_t longDistSensor(uint16_t sample)
 uint8_t shortDistSensor(uint16_t sample)
 {
 	// ska hantera om sample är utanför look up tables intervall
-	if(MAXIMUMVALUESHORT<sample)
+	if(MAXIMUMVALUESHORT<(sample+SHORTTABLEOFFSET))
 	{
 		//look up MAXIMUMVALUESHORT in look up table
 		return 0;
 	}
-	else if(sample<MINIMUMVALUESHORT)
+	else if((sample+SHORTTABLEOFFSET)<MINIMUMVALUESHORT)
 	{
 		//look up MINIMUMVALUESHORT in look up table
 		return 255;
 	}
 	else
 	{
-		return  pgm_read_byte(&(lookUpShortSensor[sample-MINIMUMVALUESHORT]));
+		return  pgm_read_byte(&(lookUpShortSensor[(sample+SHORTTABLEOFFSET)-MINIMUMVALUESHORT]));
 	}
 }
 #pragma GCC pop_options

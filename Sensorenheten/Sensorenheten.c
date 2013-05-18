@@ -30,6 +30,8 @@
 
 volatile uint8_t timer2_Overflow;//auto tune gyro
 #define GET_TIMESTAMP (((uint16_t)timer2_Overflow << 8)|(uint16_t)TCNT0)
+#define RIGHTSIDEFRONTSHORTOFFSET -5
+#define RIGHTSIDEREARSHORTOFFSE -2
 
 int main(void)
 {	
@@ -111,11 +113,11 @@ void constructSensorMessage(uint8_t *msg, uint8_t *len)
 	msg[6] = LONGLEFT;
 	msg[7] = longDistSensor(median(distSensor[3], NUMSAMPLES));
 	msg[8] = SHORTFRONTRIGHT;
-	msg[9] = shortDistSensor(median(distSensor[4], NUMSAMPLES));
+	msg[9] = shortDistSensor(median(distSensor[4], NUMSAMPLES))+RIGHTSIDEFRONTSHORTOFFSET;
 	msg[10] = SHORTFRONTLEFT;
 	msg[11] = shortDistSensor(median(distSensor[5], NUMSAMPLES));
 	msg[12] = SHORTREARRIGHT; 
-	msg[13] = shortDistSensor(median(distSensor[6], NUMSAMPLES));
+	msg[13] = shortDistSensor(median(distSensor[6], NUMSAMPLES))+RIGHTSIDEREARSHORTOFFSE;
 	msg[14] = SHORTREARLEFT;
 	msg[15] = shortDistSensor(median(distSensor[7], NUMSAMPLES));
 	msg[16] = IDGYROSENSOR;
