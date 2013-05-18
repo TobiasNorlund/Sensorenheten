@@ -30,8 +30,8 @@
 
 volatile uint8_t timer2_Overflow;//auto tune gyro
 #define GET_TIMESTAMP (((uint16_t)timer2_Overflow << 8)|(uint16_t)TCNT0)
-#define RIGHTSIDEFRONTSHORTOFFSET -5
-#define RIGHTSIDEREARSHORTOFFSE -2
+#define RIGHTSIDEFRONTSHORTOFFSET 0
+#define RIGHTSIDEREARSHORTOFFSE 0
 
 int main(void)
 {	
