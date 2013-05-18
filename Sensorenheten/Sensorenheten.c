@@ -81,15 +81,7 @@ int main(void)
 			}			
 		}
 		updateGyroData();//samplar gyrot
-		// auto calibrate Gyro
-		// Om Höger och vänster hjul snurrar lika fort
-		// 0.000128 * 5 = 0.00064 sek
-		// och mer än 2 sek sedan senast.
-		if((absThreshold(rightSensor[CurrentRightSensor], leftSensor[CurrentLeftSensor]) < 5)&&(rightSensorOverFlow[CurrentRightSensor]==leftSensorOverFlow[CurrentLeftSensor])&&(2/0.0000512f < absThreshold(autoCalibrateGyroTimestamp,GET_TIMESTAMP)))
-		{
-			calibrateGyro(10);//max 10 i komp per gång vi kalibrerar
-			autoCalibrateGyroTimestamp=GET_TIMESTAMP;
-		}
+
 		updatePinToggleCounter();//Kollar om något av hjulens sensorer har togglat. Uppdaterar tiden om så skett.
 	}
 	return 0;
