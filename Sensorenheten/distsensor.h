@@ -33,11 +33,11 @@ void Init_distsensor(void);
 /*
 * Slå upp ADC -> cm. 0 om för nära 255 om för långt bort.
 */
-uint8_t longDistSensor(uint16_t sample);
+uint8_t longDistSensor(uint16_t sample, int8_t sensorOffset);
 
 /*
 * Slå upp ADC -> cm/2. 0 om för nära 255 om för långt bort.
 */
-uint8_t shortDistSensor(uint16_t sample, uint8_t tableOffSet);
+uint8_t shortDistSensor(uint16_t sample, int8_t sensorOffset);
 
 #endif /* DISTSENSOR_H_ */

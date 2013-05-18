@@ -42,7 +42,7 @@ void Init_distsensor(void)
 //turn off optimization 
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
-uint8_t longDistSensor(uint16_t sample)
+uint8_t longDistSensor(uint16_t sample, int8_t sensorOffset)
 {
 	// ska hantera om sample är utanför look up tables intervall
 	if(MAXIMUMVALUELONG<(sample+LONGTABLEOFFSET))
@@ -57,11 +57,11 @@ uint8_t longDistSensor(uint16_t sample)
 	}
 	else
 	{
-		return  pgm_read_byte(&(lookUpLongSensor[(sample+LONGTABLEOFFSET)-MINIMUMVALUELONG]));
+		return  pgm_read_byte(&(lookUpLongSensor[(sample+LONGTABLEOFFSET)-MINIMUMVALUELONG]))+sensorOffset;
 	}
 }
 
-uint8_t shortDistSensor(uint16_t sample)
+uint8_t shortDistSensor(uint16_t sample, int8_t sensorOffset)
 {
 	// ska hantera om sample är utanför look up tables intervall
 	if(MAXIMUMVALUESHORT<(sample+SHORTTABLEOFFSET))
@@ -76,7 +76,7 @@ uint8_t shortDistSensor(uint16_t sample)
 	}
 	else
 	{
-		return  pgm_read_byte(&(lookUpShortSensor[(sample+SHORTTABLEOFFSET)-MINIMUMVALUESHORT]));
+		return  pgm_read_byte(&(lookUpShortSensor[(sample+SHORTTABLEOFFSET)-MINIMUMVALUESHORT]))+sensorOffset;
 	}
 }
 #pragma GCC pop_options
